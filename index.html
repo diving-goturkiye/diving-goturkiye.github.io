@@ -12,72 +12,93 @@
 <style>
   :root {
     --navy: #09131f; --teal: #1A7A8A; --teal-glow: rgba(26,122,138,0.5);
+    --teal-bright: #22d3ee; --teal-soft: rgba(26,122,138,0.15);
     --c1: #3498db; --c2: #2ecc71; --c3: #ff4757; --c4: #9b59b6; --c5: #e67e22; --gold: #f1c40f;
     --diff-easy: #2ecc71; --diff-med: #f39c12; --diff-hard: #e74c3c;
-    --icon-scale: 0.55; 
-    --site-label-size: 1.4rem; /* Dinamik punto için CSS değişkeni */
+    --icon-scale: 0.55;
+    --site-label-size: 1.4rem;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.08);
+    --gradient-header: linear-gradient(135deg, #09131f 0%, #0c1e32 50%, #091820 100%);
   }
   
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--navy); color: #fff; font-family: 'Source Sans 3', sans-serif; }
   body { display: flex; flex-direction: column; }
 
   /* ── HEADER ── */
-  .header { flex-shrink: 0; background: rgba(9, 19, 31, 0.95); padding: 15px 30px; border-bottom: 1px solid var(--teal); box-shadow: 0 4px 15px var(--teal-glow); z-index: 100; display:flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;}
-  .header-title h1 { font-family:'Playfair Display',serif; font-size:1.6rem; margin:0; }
+  .header {
+    flex-shrink: 0;
+    background: var(--gradient-header);
+    padding: 14px 30px;
+    border-bottom: 1px solid rgba(26,122,138,0.4);
+    box-shadow: 0 4px 30px rgba(26,122,138,0.15), 0 1px 0 rgba(255,255,255,0.03);
+    z-index: 100; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    position: relative;
+  }
+  .header::after {
+    content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--teal), rgba(34,211,238,0.55), var(--teal), transparent);
+    opacity: 0.5;
+  }
+  .header-title h1 { font-family:'Playfair Display',serif; font-size:1.65rem; margin:0; letter-spacing:-0.01em; text-shadow: 0 2px 8px rgba(0,0,0,0.4); }
   .header-title h1 span { color: var(--teal); }
-  .header-title p { font-size:.8rem; color:#a0b8cc; margin:4px 0 0 0; }
-  
-  .top-tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;}
-  
-  .badge-row { display:flex; gap:8px; flex-wrap:wrap; }
-  .badge { display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:15px; font-size:.7rem; font-weight:600; background:rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); transition: all 0.3s ease;}
-  .badge-dot { width:8px; height:8px; border-radius:50%; }
+  .header-title p { font-size:.72rem; color:#7090a8; margin:4px 0 0 0; letter-spacing:.06em; text-transform:uppercase; font-weight:600; }
 
-  .tool-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--teal); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; font-weight: 600;}
-  .tool-btn.active { background: var(--teal); box-shadow: 0 0 10px var(--teal-glow); border-color: #fff;}
-  
+  .top-tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  .badge-row { display:flex; gap:6px; flex-wrap:wrap; }
+  .badge { display:flex; align-items:center; gap:6px; padding:4px 11px; border-radius:20px; font-size:.67rem; font-weight:700; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); letter-spacing:.04em; backdrop-filter:blur(8px); transition:all 0.25s; }
+  .badge:hover { background:rgba(255,255,255,0.09); border-color:rgba(255,255,255,0.15); }
+  .badge-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+  .tool-btn { background:rgba(255,255,255,0.07); border:1px solid rgba(26,122,138,0.55); color:#c8e4ee; padding:6px 13px; border-radius:20px; font-size:0.78rem; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; font-weight:600; backdrop-filter:blur(8px); }
+  .tool-btn svg { width:14px; height:14px; flex-shrink:0; }
+  .tool-btn.active { background:linear-gradient(135deg,rgba(26,122,138,0.6),rgba(26,122,138,0.4)); border-color:rgba(34,211,238,0.45); color:#fff; box-shadow:0 0 14px rgba(26,122,138,0.4),inset 0 1px 0 rgba(255,255,255,0.08); }
+
   @media (hover: hover) {
-    .tool-btn:hover { background: var(--teal); box-shadow: 0 0 10px var(--teal-glow); }
+    .tool-btn:hover { background:linear-gradient(135deg,rgba(26,122,138,0.38),rgba(26,122,138,0.22)); border-color:rgba(26,122,138,0.75); color:#fff; box-shadow:0 0 10px rgba(26,122,138,0.28); }
   }
   
   /* ── CUSTOM DROPDOWN ── */
   .dd-wrap { position: relative; display: inline-block; }
-  .dd-trigger { display:flex; align-items:center; gap:7px; padding:6px 14px; border:1px solid var(--teal); border-radius:20px; background:rgba(255,255,255,0.07); color:#fff; font-size:.8rem; font-weight:600; cursor:pointer; transition:0.2s; white-space:nowrap; user-select:none; }
-  .dd-trigger:hover { background:rgba(26,122,138,0.25); }
-  .dd-trigger .dd-arrow { font-size:.6rem; opacity:.7; transition:transform 0.2s; margin-left:2px; }
-  .dd-wrap.open .dd-trigger { background:rgba(26,122,138,0.3); border-color:#fff; }
+  .dd-trigger { display:flex; align-items:center; gap:7px; padding:6px 14px; border:1px solid rgba(26,122,138,0.5); border-radius:20px; background:rgba(255,255,255,0.06); color:#c8e4ee; font-size:.78rem; font-weight:600; cursor:pointer; transition:all 0.2s; white-space:nowrap; user-select:none; backdrop-filter:blur(8px); }
+  .dd-trigger svg { width:13px; height:13px; flex-shrink:0; opacity:0.8; }
+  .dd-trigger:hover { background:rgba(26,122,138,0.2); border-color:rgba(26,122,138,0.75); }
+  .dd-trigger .dd-arrow { font-size:.6rem; opacity:.6; transition:transform 0.2s; margin-left:2px; }
+  .dd-wrap.open .dd-trigger { background:rgba(26,122,138,0.26); border-color:rgba(34,211,238,0.45); }
   .dd-wrap.open .dd-arrow { transform:rotate(180deg); }
-  .dd-menu { position:absolute; top:calc(100% + 6px); left:0; min-width:170px; background:rgba(9,19,31,0.98); border:1px solid var(--teal); border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.6); z-index:9999; overflow:hidden; opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity 0.18s, transform 0.18s; }
+  .dd-menu { position:absolute; top:calc(100% + 7px); left:0; min-width:180px; background:rgba(7,14,24,0.97); border:1px solid rgba(26,122,138,0.45); border-radius:14px; box-shadow:0 12px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(26,122,138,0.08); z-index:9999; overflow:hidden; opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity 0.18s,transform 0.18s; backdrop-filter:blur(16px); }
   .dd-wrap.open .dd-menu { opacity:1; transform:translateY(0); pointer-events:all; }
-  .dd-item { display:flex; align-items:center; gap:9px; padding:10px 16px; font-size:.82rem; font-weight:600; color:#c8d8e8; cursor:pointer; transition:background 0.15s; }
-  .dd-item:hover { background:rgba(26,122,138,0.25); color:#fff; }
-  .dd-item.active { color:#7ed6f7; background:rgba(14,77,110,0.5); }
-  .dd-item .dd-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .dd-item { display:flex; align-items:center; gap:9px; padding:10px 16px; font-size:.8rem; font-weight:600; color:#b8ccd8; cursor:pointer; transition:background 0.15s; }
+  .dd-item:hover { background:rgba(26,122,138,0.2); color:#e8f4ff; }
+  .dd-item.active { color:#7ed6f7; background:rgba(14,77,110,0.4); }
+  .dd-item .dd-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
   .dd-item .dd-flag { font-size:1.1rem; line-height:1; }
-  .dd-divider { height:1px; background:rgba(255,255,255,.07); margin:4px 0; }
-  .dd-header { padding:7px 16px 4px; font-size:.65rem; text-transform:uppercase; letter-spacing:.08em; color:#4a7a9b; font-weight:700; }
-  /* aktif filtre varsa trigger teal'e dönsün */
-  .dd-trigger.has-filter { background:rgba(14,77,110,0.5); border-color:#7ed6f7; color:#7ed6f7; }
+  .dd-divider { height:1px; background:rgba(255,255,255,.06); margin:4px 0; }
+  .dd-header { padding:7px 16px 4px; font-size:.63rem; text-transform:uppercase; letter-spacing:.1em; color:#3a6a8a; font-weight:700; }
+  .dd-trigger.has-filter { background:rgba(14,77,110,0.42); border-color:rgba(126,214,247,0.55); color:#7ed6f7; }
 
-  /* ── DEPTH FILTER (artık dropdown içinde kullanılmıyor, eski butonlar kaldı yedek) ── */
-  .depth-sep { width:1px; height:20px; background:rgba(255,255,255,.12); margin:0 2px; }
+  /* ── DEPTH FILTER ── */
+  .depth-sep { width:1px; height:20px; background:rgba(255,255,255,.1); margin:0 2px; }
 
   /* ── FILTERS ── */
-  .filters { flex-shrink: 0; background: rgba(9, 19, 31, 0.8); border-bottom:1px solid rgba(255,255,255,.05); padding:10px 30px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; z-index: 90;}
-  .filter-btn { padding:6px 14px; border-radius:15px; border:1px solid rgba(255,255,255,.2); background:rgba(0,0,0,0.3); color:#e0e0e0; font-size:.8rem; cursor:pointer; font-weight:600; transition:0.2s;}
-  .filter-btn.active { background:var(--teal); border-color:var(--teal); }
-  
+  .filters { flex-shrink:0; background:linear-gradient(180deg,rgba(10,22,36,0.9) 0%,rgba(9,19,31,0.8) 100%); border-bottom:1px solid rgba(26,122,138,0.15); padding:9px 30px; display:flex; gap:7px; flex-wrap:wrap; align-items:center; z-index:90; }
+  .filter-btn { padding:5px 14px; border-radius:20px; border:1px solid rgba(255,255,255,0.13); background:rgba(255,255,255,0.05); color:#b0c8d8; font-size:.78rem; cursor:pointer; font-weight:600; transition:all 0.2s; backdrop-filter:blur(6px); }
+  .filter-btn:hover { border-color:rgba(26,122,138,0.5); color:#e8f4ff; background:rgba(26,122,138,0.1); }
+  .filter-btn.active { background:linear-gradient(135deg,rgba(26,122,138,0.65),rgba(26,122,138,0.45)); border-color:rgba(34,211,238,0.38); color:#fff; box-shadow:0 2px 10px rgba(26,122,138,0.28); }
+
   .search-wrap { margin-left:auto; }
-  .search-wrap input { background:rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.2); color:#fff; padding:6px 14px; border-radius:15px; outline:none; width:180px; transition: 0.3s; }
+  .search-wrap input { background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.13); color:#fff; padding:6px 14px; border-radius:20px; outline:none; width:185px; transition:all 0.3s; font-family:'Source Sans 3',sans-serif; font-size:0.79rem; }
+  .search-wrap input:focus { border-color:rgba(26,122,138,0.65); box-shadow:0 0 0 3px rgba(26,122,138,0.1); background:rgba(0,0,0,0.38); width:210px; }
 
   /* ── TOAST ── */
-  #toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(9,19,31,0.96); border:1px solid var(--teal); color:#a8d8e8; font-size:.82rem; font-weight:600; padding:10px 22px; border-radius:20px; z-index:9999; opacity:0; transition:opacity 0.3s, transform 0.3s; pointer-events:none; white-space:nowrap; }
+  #toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(6,13,22,0.95); border:1px solid rgba(26,122,138,0.5); color:#8ec8d8; font-size:.79rem; font-weight:600; padding:10px 22px; border-radius:24px; z-index:9999; opacity:0; transition:opacity 0.3s,transform 0.3s; pointer-events:none; white-space:nowrap; backdrop-filter:blur(16px); box-shadow:0 8px 24px rgba(0,0,0,0.5),0 0 0 1px rgba(26,122,138,0.08); }
   #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-  /* ── MAIN AREA & SMOKE EFFECT ── */
+  /* ── MAIN AREA ── */
   .main { flex: 1; display: flex; position: relative; overflow: hidden; }
   #map { flex: 1; background: #000; z-index: 1; }
-  
+
 
 
   /* ── KADEMELİ BİLGİ ETİKETLERİ (Tamamen Doğal Harita Görünümü) ── */
@@ -144,98 +165,107 @@
     filter: drop-shadow(0px 0px 4px rgba(255,255,255,0.4)) drop-shadow(0px 4px 6px rgba(0,0,0,0.8));
   }
 
-  /* ── DETAIL PANEL (Leaflet popup yerine sabit panel) ── */
+  /* ── DETAIL PANEL ── */
   #detail-panel {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    width: 310px;
-    max-height: calc(100vh - 180px);
-    background: rgba(9,19,31,0.97);
-    border: 1px solid var(--teal);
-    border-radius: 14px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    z-index: 500;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.7);
-    transform: translateX(-360px);
-    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-    pointer-events: none;
+    position: absolute; bottom: 20px; left: 20px; width: 318px; max-height: calc(100vh - 185px);
+    background: rgba(6,13,22,0.97); border: 1px solid rgba(26,122,138,0.42); border-radius: 16px;
+    overflow: hidden; display: flex; flex-direction: column; z-index: 500;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.75), 0 0 0 1px rgba(26,122,138,0.08), 0 0 60px rgba(26,122,138,0.04);
+    transform: translateX(-380px); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); pointer-events: none;
+    backdrop-filter: blur(12px);
   }
-  #detail-panel.open {
-    transform: translateX(0);
-    pointer-events: all;
-  }
-  #detail-panel-body {
-    overflow-y: auto;
-    flex: 1;
-    scrollbar-width: thin;
-    scrollbar-color: var(--teal) rgba(0,0,0,0.2);
-  }
-  #detail-panel-body::-webkit-scrollbar { width: 4px; }
-  #detail-panel-body::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-  #detail-panel-body::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 2px; }
+  #detail-panel.open { transform: translateX(0); pointer-events: all; }
+  #detail-panel-body { overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: rgba(26,122,138,0.5) transparent; }
+  #detail-panel-body::-webkit-scrollbar { width: 3px; }
+  #detail-panel-body::-webkit-scrollbar-track { background: transparent; }
+  #detail-panel-body::-webkit-scrollbar-thumb { background: rgba(26,122,138,0.45); border-radius: 2px; }
   #detail-close {
-    position: absolute;
-    top: 8px; right: 10px;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.15);
-    color: #fff;
-    border-radius: 50%;
-    width: 26px; height: 26px;
-    font-size: .85rem;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 10;
-    transition: background 0.15s;
+    position: absolute; top: 9px; right: 10px;
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.65); border-radius: 50%; width: 26px; height: 26px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    z-index: 10; transition: all 0.15s;
   }
-  #detail-close:hover { background: rgba(231,76,60,0.6); }
+  #detail-close svg { width: 10px; height: 10px; }
+  #detail-close:hover { background: rgba(231,76,60,0.45); border-color: rgba(231,76,60,0.35); color: #fff; }
 
-  .popup-body { padding: 12px; }
-  .popup-koridor { font-size:.7rem; font-weight:700; text-transform:uppercase; margin-bottom:4px; }
-  .popup-name { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900; margin-bottom:6px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; padding-right: 24px; }
-  .popup-tag { font-size:.65rem; font-weight:600; padding:2px 6px; border-radius:10px; background:rgba(255,255,255,.1); margin-right: 4px; display: inline-block; margin-bottom: 4px; }
-  .popup-desc { font-size:.8rem; line-height:1.4; color:#cbd5e1; margin-bottom: 10px;}
-  .dist-badge { background: rgba(46, 204, 113, 0.2); border: 1px dashed #2ecc71; color: #2ecc71; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; display: none;}
-  .cert-badge { display:inline-block; background:rgba(231,76,60,.15); border:1px solid rgba(231,76,60,.35); color:#e74c3c; font-size:.62rem; font-weight:600; padding:2px 7px; border-radius:10px; margin-bottom:4px; letter-spacing:.3px; }
-  .marine-data { background: rgba(0,0,0,0.4); border-radius: 6px; padding: 8px; font-size: 0.75rem; margin-bottom: 8px; }
-  .md-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 3px; margin-bottom: 3px; }
-  .photo-search-bar { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding: 10px 12px 12px; background: #071320; border-top: 1px solid rgba(255,255,255,.07); }
-  .photo-search-btn { display:flex; align-items:center; justify-content:center; gap:5px; padding:9px 8px; border-radius:6px; border: 1px solid rgba(255,255,255,.1); font-size:.78rem; font-weight:500; cursor:pointer; text-decoration:none; white-space:nowrap; color:#e8eef4; background:rgba(255,255,255,.06); transition: background .15s, border-color .15s; }
-  .photo-search-btn:hover { background:rgba(255,255,255,.13); border-color:rgba(255,255,255,.22); color:#fff; }
-  .photo-search-btn span.btn-icon { font-size:.85rem; opacity:.85; }
-  .photo-search-label { grid-column:1/-1; font-size:.6rem; color:#2e5470; text-align:center; margin-top:2px; font-style:italic; }
+  .popup-body { padding: 14px; }
+  .popup-koridor { font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:5px; opacity:0.8; }
+  .popup-name { font-family:'Playfair Display',serif; font-size:1.15rem; font-weight:900; margin-bottom:7px; border-bottom:1px solid rgba(255,255,255,0.07); padding-bottom:8px; padding-right:28px; line-height:1.3; }
+  .popup-tag { font-size:.62rem; font-weight:700; padding:3px 8px; border-radius:12px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,0.07); margin-right:4px; display:inline-block; margin-bottom:4px; letter-spacing:.04em; }
+  .popup-desc { font-size:.8rem; line-height:1.5; color:#a8bccc; margin-bottom:10px; }
+  .popup-stats { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
+  .popup-stat { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:6px 8px; }
+  .popup-stat-label { font-size:.57rem; color:#3a6a8a; font-weight:700; text-transform:uppercase; letter-spacing:.07em; margin-bottom:2px; }
+  .popup-stat-value { font-size:.8rem; font-weight:700; color:#dce8f2; }
+  .dist-badge { background:rgba(46,204,113,0.1); border:1px solid rgba(46,204,113,0.3); color:#2ecc71; padding:4px 10px; border-radius:8px; font-size:0.72rem; font-weight:700; margin-bottom:10px; display:none; align-items:center; gap:5px; }
+  .dist-badge svg { width:11px; height:11px; flex-shrink:0; }
+  .cert-badge { display:inline-block; background:rgba(231,76,60,.09); border:1px solid rgba(231,76,60,.28); color:#e74c3c; font-size:.6rem; font-weight:700; padding:2px 8px; border-radius:12px; margin-bottom:5px; letter-spacing:.04em; }
+  .marine-data { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:8px 10px; font-size:0.75rem; margin-bottom:8px; }
+  .md-row { display:flex; justify-content:space-between; align-items:center; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.05); color:#7090a8; }
+  .md-row:last-child { border-bottom:none; }
+  .md-row span:last-child { color:#dce8f2; font-weight:600; }
+  .photo-search-bar { display:grid; grid-template-columns:1fr 1fr; gap:5px; padding:10px 12px 12px; background:rgba(3,9,16,0.8); border-top:1px solid rgba(255,255,255,0.04); }
+  .photo-search-btn { display:flex; align-items:center; justify-content:center; gap:5px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); font-size:.74rem; font-weight:600; cursor:pointer; text-decoration:none; white-space:nowrap; color:#b8ccd8; background:rgba(255,255,255,0.05); transition:all 0.15s; }
+  .photo-search-btn:hover { background:rgba(26,122,138,0.18); border-color:rgba(26,122,138,0.38); color:#fff; }
+  .photo-search-btn svg { width:13px; height:13px; flex-shrink:0; opacity:0.8; }
+  .photo-search-label { grid-column:1/-1; font-size:.57rem; color:#2a4a60; text-align:center; margin-top:2px; font-style:italic; }
+
+  /* ── OKUL POPUP (Leaflet popup) ── */
+  .popup-inner { padding:10px 12px; }
+  .popup-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:900; margin-bottom:5px; line-height:1.3; }
+  .popup-info-row { display:flex; align-items:center; gap:6px; font-size:.77rem; color:#8cacbc; margin-bottom:4px; }
+  .popup-info-row svg { width:12px; height:12px; flex-shrink:0; opacity:0.65; color:#6090a8; }
+  .popup-info-row a { color:var(--teal); text-decoration:none; }
+  .popup-info-row a:hover { text-decoration:underline; }
 
   @media(max-width:768px) {
     #detail-panel { left: 10px; right: 10px; width: auto; bottom: 10px; max-height: 50vh; transform: translateY(110%); }
     #detail-panel.open { transform: translateY(0); }
   }
 
-  .locate-btn { position: absolute; bottom: 25px; right: 375px; z-index: 1000; width: 44px; height: 44px; background: rgba(9, 19, 31, 0.9); border: 2px solid var(--teal); border-radius: 50%; color: var(--teal); cursor: pointer; font-size: 20px; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px var(--teal-glow); transition: 0.2s;}
+  .locate-btn {
+    position: absolute; bottom: 25px; right: 375px; z-index: 1000;
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, rgba(26,122,138,0.28), rgba(9,19,31,0.88));
+    border: 1.5px solid rgba(26,122,138,0.6); border-radius: 50%; color: var(--teal);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(26,122,138,0.22), inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: all 0.2s; backdrop-filter: blur(10px);
+  }
+  .locate-btn svg { width: 20px; height: 20px; }
+  .locate-btn:hover { box-shadow: 0 4px 22px rgba(26,122,138,0.42), 0 0 0 4px rgba(26,122,138,0.1); border-color: rgba(34,211,238,0.55); }
   .locate-btn:active { transform: scale(0.9); }
 
   /* ── SIDEBAR ── */
-  .sidebar { width: 350px; background: rgba(9, 19, 31, 0.98); overflow-y: auto; border-left: 1px solid var(--teal); z-index: 2; }
-  .sidebar-section-header { padding:14px 20px; display:flex; align-items:center; gap:10px; cursor: pointer; background:#09131f; border-bottom:1px solid rgba(255,255,255,.1); position: sticky; top: 0;}
-  .ssh-title { font-family:'Playfair Display',serif; font-size:.95rem; font-weight:700; flex:1; }
-  .ssh-count { font-size:.7rem; background:rgba(26,122,138,.3); padding:2px 6px; border-radius:8px; font-weight: 600; color:#fff; }
+  .sidebar { width: 350px; background: rgba(6,13,22,0.99); overflow-y: auto; border-left: 1px solid rgba(26,122,138,0.28); z-index: 2; scrollbar-width: thin; scrollbar-color: rgba(26,122,138,0.35) transparent; }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(26,122,138,0.35); border-radius: 2px; }
+  .sidebar-section-header { padding:12px 20px; display:flex; align-items:center; gap:10px; cursor:pointer; background:linear-gradient(180deg,rgba(9,19,31,0.98) 0%,rgba(7,16,26,0.95) 100%); border-bottom:1px solid rgba(255,255,255,.05); position:sticky; top:0; z-index:5; transition:background 0.2s; }
+  .sidebar-section-header:hover { background:linear-gradient(180deg,rgba(14,28,44,0.98) 0%,rgba(11,22,36,0.95) 100%); }
+  .ssh-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .ssh-title { font-family:'Playfair Display',serif; font-size:.92rem; font-weight:700; flex:1; }
+  .ssh-count { font-size:.66rem; background:rgba(26,122,138,.22); padding:2px 7px; border-radius:10px; font-weight:700; color:#7ed6f7; }
+  .ssh-toggle { font-size:.6rem; color:#3a6a8a; transition:transform 0.25s,color 0.2s; }
   .sidebar-section.expanded .ssh-toggle { transform: rotate(180deg); color: var(--teal); }
   .sidebar-section-content { display: none; }
   .sidebar-section.expanded .sidebar-section-content { display: block; }
-  .site-item { padding:12px 20px; cursor:pointer; border-bottom: 1px solid rgba(255,255,255,.03); border-left:4px solid transparent; transition: 0.2s;}
-  .site-item:active { background:rgba(26,122,138,.1); }
-  .site-item.highlighted { border-left-color:var(--teal); background:rgba(26,122,138,.2); }
-  .site-item-name { font-size:.85rem; font-weight:600; margin-bottom: 4px; color: #e2e8f0;}
-  .site-item-meta { font-size:.7rem; color:#94a3b8; display: flex; gap: 8px;}
+  .site-item { padding:10px 18px 10px 20px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,.025); border-left:3px solid transparent; transition:all 0.18s; }
+  .site-item:hover { background:rgba(26,122,138,.07); border-left-color:rgba(26,122,138,0.38); }
+  .site-item:active { background:rgba(26,122,138,.12); }
+  .site-item.highlighted { border-left-color:var(--teal); background:rgba(26,122,138,.16); }
+  .site-item-name { font-size:.84rem; font-weight:600; margin-bottom:4px; color:#dce8f2; line-height:1.3; }
+  .site-item-meta { font-size:.67rem; color:#4a6a80; display:flex; align-items:center; gap:5px; }
+  .site-item-meta svg { width:10px; height:10px; flex-shrink:0; }
 
-  @media(max-width:768px) { 
-    .header { padding: 15px 20px; flex-direction: column; align-items: flex-start; }
+  @media(max-width:768px) {
+    .header { padding: 13px 18px; flex-direction: column; align-items: flex-start; }
     .top-tools { width: 100%; justify-content: space-between; }
-    .badge-row { width: 100%; margin-bottom: 5px; }
-    .main { flex-direction:column; } 
-    .sidebar { width:100%; height: 40vh; } 
-    .locate-btn { bottom: 42vh; right: 15px; } 
+    .badge-row { width: 100%; margin-bottom: 4px; }
+    .main { flex-direction: column; }
+    .sidebar { width: 100%; height: 40vh; }
+    .locate-btn { bottom: 42vh; right: 15px; }
   }
 </style>
 </head>
@@ -248,7 +278,7 @@
   </div>
   <div class="top-tools">
     <div class="badge-row" id="badge-row"></div>
-    <button class="tool-btn" id="seaMapToggle" title="Denizcilik Haritası Katmanını Aç/Kapat">🌊 Deniz Haritası</button>
+    <button class="tool-btn" id="seaMapToggle" title="Denizcilik Haritası Katmanını Aç/Kapat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c1-2 3-2 4 0s3 2 4 0 3-2 4 0 3 2 4 0"/><path d="M2 17c1-2 3-2 4 0s3 2 4 0 3-2 4 0 3 2 4 0"/><path d="M2 7c1-2 3-2 4 0s3 2 4 0 3-2 4 0 3 2 4 0"/></svg> <span id="seaMapLabel">Deniz Haritası</span></button>
     <div class="dd-wrap" id="langDDWrap">
       <div class="dd-trigger" id="langTrigger">
         <span id="langFlag"><svg width="20" height="14" viewBox="0 0 30 20" style="border-radius:2px;vertical-align:middle"><rect width="30" height="20" fill="#E30A17"/><circle cx="10.5" cy="10" r="6" fill="#fff"/><circle cx="12" cy="10" r="4.8" fill="#E30A17"/><polygon points="16.5,10 18.5,8.8 18.5,11.2" fill="#fff"/><polygon points="17.5,7.5 20.5,10 17.5,12.5 18.5,10" fill="#fff"/></svg></span>
@@ -278,27 +308,27 @@
 
   <!-- Derinlik Dropdown -->
   <div class="dd-wrap" id="depthDDWrap">
-    <div class="dd-trigger" id="depthTrigger">⬇ Derinlik <span class="dd-arrow">▼</span></div>
+    <div class="dd-trigger" id="depthTrigger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg> <span id="depthTriggerLabel">Derinlik</span> <span class="dd-arrow">▼</span></div>
     <div class="dd-menu" id="depthMenu">
-      <div class="dd-header">Maksimum Derinlik</div>
-      <div class="dd-item" data-depth="shallow"><span class="dd-dot" style="background:#2ecc71"></span>🏊 Sığ <span style="opacity:.55;font-size:.75rem;margin-left:4px">≤ 18m</span></div>
-      <div class="dd-item" data-depth="mid"><span class="dd-dot" style="background:#f39c12"></span>🤿 Orta <span style="opacity:.55;font-size:.75rem;margin-left:4px">18 – 30m</span></div>
-      <div class="dd-item" data-depth="deep"><span class="dd-dot" style="background:#e74c3c"></span>⚙️ Derin <span style="opacity:.55;font-size:.75rem;margin-left:4px">30m +</span></div>
+      <div class="dd-header" id="depthMenuHeader">Maksimum Derinlik</div>
+      <div class="dd-item" data-depth="shallow"><span class="dd-dot" style="background:#2ecc71"></span><span id="dd-shallow">Sığ <span style="opacity:.5;font-size:.75rem">≤ 18m</span></span></div>
+      <div class="dd-item" data-depth="mid"><span class="dd-dot" style="background:#f39c12"></span><span id="dd-mid">Orta <span style="opacity:.5;font-size:.75rem">18 – 30m</span></span></div>
+      <div class="dd-item" data-depth="deep"><span class="dd-dot" style="background:#e74c3c"></span><span id="dd-deep">Derin <span style="opacity:.5;font-size:.75rem">30m +</span></span></div>
       <div class="dd-divider"></div>
-      <div class="dd-item" data-depth="all" id="depthClear" style="color:#4a7a9b;font-size:.75rem">✕ Filtreyi Kaldır</div>
+      <div class="dd-item" data-depth="all" id="depthClear" style="color:#4a7a9b;font-size:.75rem"><span id="dd-depth-clear">Filtreyi Kaldır</span></div>
     </div>
   </div>
 
   <!-- Seviye Dropdown -->
   <div class="dd-wrap" id="levelDDWrap">
-    <div class="dd-trigger" id="levelTrigger">⚑ Seviye <span class="dd-arrow">▼</span></div>
+    <div class="dd-trigger" id="levelTrigger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> <span id="levelTriggerLabel">Seviye</span> <span class="dd-arrow">▼</span></div>
     <div class="dd-menu" id="levelMenu">
-      <div class="dd-header">Dalış Seviyesi</div>
-      <div class="dd-item" data-level="beginner"><span class="dd-dot" style="background:#2ecc71"></span>🟢 Başlangıç</div>
-      <div class="dd-item" data-level="intermediate"><span class="dd-dot" style="background:#f39c12"></span>🟡 Orta</div>
-      <div class="dd-item" data-level="advanced"><span class="dd-dot" style="background:#e74c3c"></span>🔴 İleri / Teknik</div>
+      <div class="dd-header" id="levelMenuHeader">Dalış Seviyesi</div>
+      <div class="dd-item" data-level="beginner"><span class="dd-dot" style="background:#2ecc71"></span><span id="dd-beginner">Başlangıç</span></div>
+      <div class="dd-item" data-level="intermediate"><span class="dd-dot" style="background:#f39c12"></span><span id="dd-intermediate">Orta</span></div>
+      <div class="dd-item" data-level="advanced"><span class="dd-dot" style="background:#e74c3c"></span><span id="dd-advanced">İleri / Teknik</span></div>
       <div class="dd-divider"></div>
-      <div class="dd-item" data-level="all" id="levelClear" style="color:#4a7a9b;font-size:.75rem">✕ Filtreyi Kaldır</div>
+      <div class="dd-item" data-level="all" id="levelClear" style="color:#4a7a9b;font-size:.75rem"><span id="dd-level-clear">Filtreyi Kaldır</span></div>
     </div>
   </div>
 
@@ -310,10 +340,10 @@
 <div class="main">
   <div id="map"></div>
   <div id="detail-panel">
-    <button id="detail-close" onclick="closeDetailPanel()">✕</button>
+    <button id="detail-close" onclick="closeDetailPanel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     <div id="detail-panel-body"></div>
   </div>
-  <button class="locate-btn" id="locateBtn" title="Konumumu Bul">🎯</button>
+  <button class="locate-btn" id="locateBtn" title="Konumumu Bul"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg></button>
   <div class="sidebar" id="sidebar-content"></div>
 </div>
 
@@ -323,22 +353,58 @@ try {
   let userLatLng = null;
 
   const i18n = {
-    tr: { 
-      title: "Türkiye <span>Dalış Noktaları</span>", sub: "Gerçek Koordinatlı Dalış Envanteri", diff: "Zorluk Modu", 
-      all: "Tümü", wreck: "⚓ Batık", reef: "🪸 Resif", cave: "🕳️ Mağara", school: "🤿 Okullar & Tesisler", search: "Arama yap...", 
-      wait: "Deniz Verisi Bekleniyor...", depth: "Derinlik", level: "Seviye", dist: "Sana Uzaklık", weather: "Hava", wind: "Rüzgar", 
-      address: "Adres", phone: "Telefon", web: "Web", auth: "TSSF Belge No", here: "Buradasınız!", gem: "Gizli Cevher", 
+    tr: {
+      title: "Türkiye <span>Dalış Noktaları</span>", sub: "Gerçek Koordinatlı Dalış Envanteri", diff: "Zorluk Modu",
+      all: "Tümü", wreck: "⚓ Batık", reef: "🪸 Resif", cave: "🕳️ Mağara", school: "🤿 Okullar & Tesisler", search: "Arama yap...",
+      wait: "Deniz Verisi Bekleniyor...", depth: "Derinlik", level: "Seviye", dist: "Sana Uzaklık",
+      address: "Adres", phone: "Telefon", web: "Web", auth: "TSSF Belge No", here: "Buradasınız!", gem: "Gizli Cevher",
       c_can: "Çanakkale", c_mar: "Marmara", c_ege: "Ege", c_akd: "Akdeniz", c_kar: "Karadeniz",
-      lv_easy: "Başlangıç", lv_med: "Orta", lv_hard: "İleri/Teknik"
+      lv_easy: "Başlangıç", lv_med: "Orta", lv_hard: "İleri/Teknik",
+      depth_label: "Derinlik", level_label: "Seviye",
+      depth_header: "Maksimum Derinlik", level_header: "Dalış Seviyesi",
+      shallow: "Sığ", shallow_range: "≤ 18m", mid: "Orta", mid_range: "18–30m", deep: "Derin", deep_range: "30m +",
+      clear_filter: "Filtreyi Kaldır",
+      school_type: "OKUL & TESİS",
+      no_data: "Veri yok", conn_error: "Bağlantı hatası",
+      sea_map: "Deniz Haritası", sea_map_open: "Denizcilik haritası katmanı açıldı",
+      sea_map_zoom: "Denizcilik haritası zoom 10+ seviyesinde görünür — yaklaştırın",
+      sea_map_close: "Denizcilik haritası kapatıldı",
+      marine_temp: "Hava", marine_wind: "Rüzgar", marine_sea: "Deniz", marine_wave: "Dalga", marine_period: "Periyot",
+      nearby_centers: "Yakın Dalış Merkezleri", photos_tr: "Görseller", photos_en: "Photos",
+      photos_label: "Fotoğraf henüz eklenmedi"
     },
-    en: { 
-      title: "Türkiye <span>Dive Sites</span>", sub: "Real Coordinate Diving Inventory & Centers", diff: "Difficulty View", 
-      all: "All", wreck: "⚓ Wrecks", reef: "🪸 Reefs", cave: "🕳️ Caves", school: "🤿 Dive Centers", search: "Search sites...", 
-      wait: "Loading Marine Data...", depth: "Depth", level: "Skill Level", dist: "Distance to you", weather: "Weather", wind: "Wind", 
+    en: {
+      title: "Türkiye <span>Dive Sites</span>", sub: "Real Coordinate Diving Inventory & Centers", diff: "Difficulty View",
+      all: "All", wreck: "⚓ Wrecks", reef: "🪸 Reefs", cave: "🕳️ Caves", school: "🤿 Dive Centers", search: "Search sites...",
+      wait: "Loading Marine Data...", depth: "Depth", level: "Skill Level", dist: "Distance to you",
       address: "Address", phone: "Phone", web: "Website", auth: "TSSF License ID", here: "You are here!", gem: "Hidden Gem",
-      c_can: "Canakkale", c_mar: "Marmara", c_ege: "Aegean", c_akd: "Mediterranean", c_kar: "Black Sea",
-      lv_easy: "Beginner", lv_med: "Intermediate", lv_hard: "Adv/Technical"
+      c_can: "Çanakkale", c_mar: "Marmara", c_ege: "Aegean", c_akd: "Mediterranean", c_kar: "Black Sea",
+      lv_easy: "Beginner", lv_med: "Intermediate", lv_hard: "Adv/Technical",
+      depth_label: "Depth", level_label: "Skill Level",
+      depth_header: "Maximum Depth", level_header: "Diving Skill Level",
+      shallow: "Shallow", shallow_range: "≤ 18m", mid: "Medium", mid_range: "18–30m", deep: "Deep", deep_range: "30m +",
+      clear_filter: "Clear Filter",
+      school_type: "DIVE CENTER",
+      no_data: "No data", conn_error: "Connection error",
+      sea_map: "Sea Chart", sea_map_open: "Nautical chart layer enabled",
+      sea_map_zoom: "Sea chart visible at zoom 10+ — zoom in",
+      sea_map_close: "Nautical chart layer disabled",
+      marine_temp: "Weather", marine_wind: "Wind", marine_sea: "Sea temp.", marine_wave: "Wave", marine_period: "Period",
+      nearby_centers: "Nearby Dive Centers", photos_tr: "Görseller (TR)", photos_en: "Photos (EN)",
+      photos_label: "No photos added yet"
     }
+  };
+
+  // ── SVG İKON TANIMI ──
+  const SVG = {
+    phone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .99h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7a2 2 0 011.72 2.03z"/></svg>`,
+    globe: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>`,
+    pin: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
+    star: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+    image: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`,
+    play: `<svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
+    anchor: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0020 0h-3"/></svg>`,
+    arrowDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`,
   };
 
   const dictTur = { "batik": {tr: "Batık", en: "Wreck"}, "resif": {tr: "Resif", en: "Reef"}, "magara": {tr: "Mağara", en: "Cave"}, "arkeoloji": {tr: "Arkeoloji", en: "Archaeology"}, "sanat": {tr: "Sanat", en: "Art"} };
@@ -536,8 +602,8 @@ try {
     { id:68, koridor:"Marmara", lat:40.86215, lng:29.10025, name:"Heybeliada – Manastır Resifi", name_en:"Heybeliada Monastery Reef", tur:["resif"], derinlik:"10–30m", seviye:"Orta", desc:"Terk-i Dünya Manastırı altındaki korunaklı resif. Marmara'nın kendine özgü fauna ve mercanları; en az bozulmuş noktalardan biri.", desc_en:"Sheltered reef below Terki Dunya Monastery. Marmara's unique fauna and corals; one of the least disturbed sites in the sea." },
     { id:69, koridor:"Marmara", lat:40.88015, lng:29.06225, name:"Burgazada – Kalpazankaya", name_en:"Burgazada Kalpazankaya", tur:["resif"], derinlik:"10–28m", seviye:"Orta", desc:"Burgazada'nın batı burnundaki kayalık resif. Sargos, lahoz ve müren yoğunluğu. Sait Faik'in yazdığı adanın sualtı hazinesi.", desc_en:"Rocky reef at the western cape of Burgazada. Dense grouper, moray and sargos. Underwater treasure of the island made famous by Sait Faik." },
     { id:70, koridor:"Karadeniz", lat:41.13215, lng:29.83025, name:"Kilimli Koyu – Ağva", name_en:"Kilimli Bay Agva", tur:["resif"], derinlik:"3–20m", seviye:"Başlangıç-Orta", desc:"Ağva/Şile'nin bakir turkuaz koyunda tüplü dalış ve şnorkel. Karadeniz'in kaya oluşumları arasında renkli deniz yaşamı; İstanbul'a 1 saat mesafe.", desc_en:"Scuba and snorkel in Agva's pristine turquoise cove. Colourful marine life among Black Sea rock formations; 1 hour from Istanbul." },
-    { id:1, koridor:"Çanakkale", lat:40.04347, lng:26.17765, name:"HMS Majestic", name_en:"HMS Majestic", tur:["batik"], derinlik:"24m", seviye:"Tüm seviyeler", desc:"27 Mayıs 1915'te U-21 torpili ile batan İngiliz zırhlısı. Top kuleleri hâlâ sağlam. Dünyanın tek WWI sualtı parkının en dramatik enkazı.", desc_en:"British battleship sunk by U-21 torpedo on 27 May 1915. Gun turrets still intact. The most dramatic wreck in the world's only WWI underwater park." },
-    { id:2, koridor:"Çanakkale", lat:40.05031, lng:26.20015, name:"Gelibolu Tarihi Sualtı Parkı", name_en:"Gallipoli Underwater Park", tur:["batik"], derinlik:"15–40m", seviye:"Tüm seviyeler", desc:"150 km² alanda 23 savaş gemisi enkazı. 2021'de açılan dünyanın tek WWI temalı sualtı parkı. Tarihi önemi tartışmasız.", desc_en:"23 warship wrecks across 150 km². The world's only WWI-themed underwater park, opened in 2021. Historically unrivaled." },
+    { id:1, koridor:"Çanakkale", lat:40.04347, lng:26.17765, name:"HMS Majestic", name_en:"HMS Majestic", tur:["batik"], derinlik:"24m", seviye:"Tüm seviyeler", desc:"27 Mayıs 1915'te U-21 torpili ile batan İngiliz zırhlısı. Top kuleleri hâlâ sağlam. Dünyanın tek Birinci Dünya Savaşı sualtı parkının en dramatik enkazı.", desc_en:"British battleship sunk by U-21 torpedo on 27 May 1915. Gun turrets still intact. The most dramatic wreck in the world's only WWI underwater park." },
+    { id:2, koridor:"Çanakkale", lat:40.05031, lng:26.20015, name:"Gelibolu Tarihi Sualtı Parkı", name_en:"Gallipoli Underwater Park", tur:["batik"], derinlik:"15–40m", seviye:"Tüm seviyeler", desc:"150 km² alanda 23 savaş gemisi enkazı. 2021'de açılan dünyanın tek Birinci Dünya Savaşı temalı sualtı parkı. Tarihi önemi tartışmasız.", desc_en:"23 warship wrecks across 150 km². The world's only WWI-themed underwater park, opened in 2021. Historically unrivaled." },
     { id:3, koridor:"Çanakkale", lat:40.26191, lng:26.28112, name:"Lundy Batığı", name_en:"Lundy Shipwreck", tur:["batik"], derinlik:"28m", seviye:"Orta", desc:"1908 yapımı 188 tonluk tarihi batık. Suvla Koyu'nda yüksek görüş mesafesiyle dikkat çeker.", desc_en:"188-ton historical wreck built in 1908. Located in Suvla Bay with exceptionally high visibility." },
     { id:4, koridor:"Çanakkale", lat:39.48364, lng:26.33641, name:"Assos Sualtı Antik Limanı", name_en:"Assos Ancient Harbor", tur:["arkeoloji"], derinlik:"5–20m", seviye:"Tüm seviyeler", gem:true, desc:"Antik Assos kentinin sualtındaki liman kalıntıları. Taş bloklar ve çapa izleri. Az bilinen arkeolojik gizem.", desc_en:"Underwater harbor ruins of ancient Assos. Stone blocks and anchor marks. A little-known archaeological mystery." },
     { id:5, koridor:"Çanakkale", lat:40.23512, lng:25.92543, name:"Gökçeada Deniz Parkı", name_en:"Gokceada Marine Park", tur:["resif"], derinlik:"5–35m", seviye:"Tüm seviyeler", gem:true, desc:"Ege'nin tek deniz koruma alanı. Temiz su, zengin yaban hayatı ve nadiren dalınan koylar.", desc_en:"The Aegean's only marine protected area. Crystal clear water, rich wildlife and rarely dived coves." },
@@ -557,7 +623,7 @@ try {
     { id:19, koridor:"Ege", lat:36.98305, lng:27.59625, name:"Orak Adası", name_en:"Orak Island", tur:["resif"], derinlik:"5–80m", seviye:"İleri", gem:true, desc:"5m'den ani 80m uçurumu. Az ziyaret edilen teknik nokta; büyük pelagik sürüler.", desc_en:"Sudden 80m wall drop from 5m. Rarely visited technical site; large pelagic fish schools." },
     { id:20, koridor:"Ege", lat:36.95515, lng:27.31125, name:"Kargı Adası", name_en:"Kargi Island", tur:["resif"], derinlik:"10–40m", seviye:"Orta-İleri", gem:true, desc:"Bodrum'dan 1,5 saat; ıssız ve zengin fauna. Liveaboard için ideal; keşfedilmemiş köşeler mevcut.", desc_en:"1.5 hours from Bodrum; remote and rich fauna. Ideal for liveaboard; unexplored corners await." },
     { id:21, koridor:"Ege", lat:36.81015, lng:28.26025, name:"Marmaris Açıkları", name_en:"Marmaris Reefs", tur:["resif","batik"], derinlik:"10–40m", seviye:"Tüm seviyeler", desc:"50+ dalış noktası, antik kalıntılar ve zengin resif yaşamı. Kara İncir adaları çevresinde yunus ve Akdeniz foku.", desc_en:"50+ dive sites, ancient ruins and rich reef life. Dolphin and Mediterranean monk seal around the Kara İncir islands." },
-    { id:22, koridor:"Ege", lat:36.99515, lng:28.15025, name:"Gökova Körfezi Duvar", name_en:"Gokova Bay Wall", tur:["resif"], derinlik:"10–50m", seviye:"Orta-İleri", gem:true, desc:"Türkiye'nin en dramatik duvar dalış topografyası. Derinlerde dev orkinos sürüleri; güçlü akıntı.", desc_en:"Turkey's most dramatic wall dive topography. Giant tuna schools in the deep; strong currents." },
+    { id:22, koridor:"Ege", lat:36.99515, lng:28.15025, name:"Gökova Körfezi Duvar", name_en:"Gokova Bay Wall", tur:["resif"], derinlik:"10–50m", seviye:"Orta-İleri", gem:true, desc:"Türkiye'nin en dramatik duvar dalış topografyası. Derinlerde dev orkinos sürüleri; güçlü akıntı.", desc_en:"Türkiye's most dramatic wall dive topography. Giant tuna schools in the deep; strong currents." },
     { id:23, koridor:"Ege", lat:36.69052, lng:27.68007, name:"Datça Akvaryum", name_en:"Datca Aquarium Bay", tur:["resif"], derinlik:"5–30m", seviye:"Tüm seviyeler", desc:"Datça'nın berrak ve sakin sularında renkli resif. Ege koridorunun güney ucunda huzurlu bir nokta.", desc_en:"Colorful reef in the crystal-clear calm waters of Datça. A peaceful spot at the southern tip of the Aegean corridor." },
     { id:24, koridor:"Ege", lat:37.84515, lng:27.24025, name:"Kuşadası Yapay Resif", name_en:"Kusadasi Artificial Reef", tur:["batik"], derinlik:"15–35m", seviye:"Orta", desc:"Yapay resif olarak batırılan eski sahil güvenlik gemisi. Orta derinlikte erişilebilir ve alg kaplı yapı.", desc_en:"Old coast guard vessel sunk as an artificial reef. Accessible at mid-depth, fully covered in algae and marine growth." },
     { id:25, koridor:"Ege", lat:37.35015, lng:27.25025, name:"Didim Apollon Çevresi", name_en:"Didim Apollo Ruins", tur:["arkeoloji","resif"], derinlik:"5–25m", seviye:"Orta", gem:true, desc:"Apollon Tapınağı yakınlarındaki antik kalıntılar. Sualtı arkeoloji gözlem turu için ideal.", desc_en:"Ancient ruins near the Temple of Apollo. Ideal for an underwater archaeology observation tour." },
@@ -573,7 +639,7 @@ try {
     { id:33, koridor:"Akdeniz", lat:36.64015, lng:29.02525, name:"Turgut'un Yeri", name_en:"Turgut's Place", tur:["magara"], derinlik:"25–60m", seviye:"İleri", gem:true, desc:"30m tünele giriş; 60m yüzüş, 25m çıkış. Karides koridorları ve üstünde uçak motoru kalıntısı.", desc_en:"Entry into a 30m tunnel; 60m swim, exit at 25m. Shrimp corridors and an aircraft engine ruin above." },
     { id:34, koridor:"Akdeniz", lat:36.25015, lng:29.41025, name:"Kalkan Duvar", name_en:"Kalkan Wall", tur:["resif"], derinlik:"10–40m", seviye:"Orta", desc:"Açık deniz konumunda büyük balık sürüsü gözlem alanları. Duvar dalışı; Kalkan'ın en popüler tekne güzergahı.", desc_en:"Open sea position with large fish school observation. Wall dive; Kalkan's most popular boat route." },
     { id:35, koridor:"Akdeniz", lat:36.17945, lng:29.63615, name:"Kanyon + Dimitri", name_en:"Canyon & Dimitri Wreck", tur:["resif","batik"], derinlik:"4–42m", seviye:"Orta", desc:"Kaş'ın meşhur kanyonu ve 1968 tarihli pamuk gemisi Dimitri. 4–42m arası hem yeni başlayan hem ileri seviyeye uygun.", desc_en:"Famous Kaş canyon plus the 1968 cotton cargo ship Dimitri. 4–42m range suits beginners and advanced divers alike." },
-    { id:36, koridor:"Akdeniz", lat:36.14115, lng:29.56385, name:"Uçanbalık Bankosu", name_en:"Flying Fish Reef & SM79", tur:["batik"], derinlik:"58–71m", seviye:"Teknik", desc:"Türkiye'nin en elit teknik dalış noktası. 58–71m arasında WWII İtalyan SM79 bombardıman uçağı.", desc_en:"Turkey's most elite technical dive site. WWII Italian SM79 bomber aircraft at 58–71m depth." },
+    { id:36, koridor:"Akdeniz", lat:36.14115, lng:29.56385, name:"Uçanbalık Bankosu", name_en:"Flying Fish Reef & SM79", tur:["batik"], derinlik:"58–71m", seviye:"Teknik", desc:"Türkiye'nin en elit teknik dalış noktası. 58–71m arasında İkinci Dünya Savaşı'na ait İtalyan SM79 bombardıman uçağı.", desc_en:"Türkiye's most elite technical dive site. WWII Italian SM79 bomber aircraft at 58–71m depth." },
     { id:37, koridor:"Akdeniz", lat:36.19325, lng:29.65085, name:"Limanağzı – C47", name_en:"Limanagzi C47 Wreck", tur:["batik"], derinlik:"18–26m", seviye:"Tüm seviyeler", desc:"C47 Dakota uçak batığı ve tarihi Osmanlı ahşap gemi iskeleti. Gece dalışı için Kaş'ta birinci tercih.", desc_en:"C47 Dakota plane wreck and Ottoman wooden ship skeleton. The top night dive choice in Kaş." },
     { id:38, koridor:"Akdeniz", lat:36.16015, lng:29.56025, name:"Besmi Adası", name_en:"Besmi Island", tur:["resif","arkeoloji"], derinlik:"10–40m+", seviye:"Orta-İleri", desc:"40m+ amfora ve çapa kalıntıları. Besmi'nin ayakkabı şeklindeki silüeti fotoğrafçılar için ikonik.", desc_en:"Amphora and anchor ruins at 40m+. Besmi's shoe-shaped silhouette is iconic for photographers." },
     { id:39, koridor:"Akdeniz", lat:36.19515, lng:29.62025, name:"Hidayet Koyu", name_en:"Hidayet Bay", tur:["batik","resif"], derinlik:"18–26m", seviye:"Orta", desc:"Sakin Hidayet Koyu'nda gemi batığı; Altuğ gemisi ve tarım uçağı kalıntısı. Müren, kaplumbağa, vatoz.", desc_en:"Ship wreck in calm Hidayet Bay; Altuğ vessel and agricultural aircraft remains. Moray, turtle, stingray." },
@@ -581,18 +647,18 @@ try {
     { id:41, koridor:"Akdeniz", lat:36.18815, lng:29.63225, name:"Oasis Banko", name_en:"Oasis Reef", tur:["resif"], derinlik:"16m", seviye:"Orta", desc:"Kaplumbağa, barakuda ve aslan balığı gözlemi. 16m tavanıyla başlangıç seviyesine de uygun.", desc_en:"Sea turtle, barracuda and lionfish observation. 16m ceiling makes it accessible for beginners too." },
     { id:42, koridor:"Akdeniz", lat:36.17015, lng:29.59525, name:"Gürmenli Ada", name_en:"Gurmenli Island", tur:["resif"], derinlik:"10–40m", seviye:"Orta-İleri", desc:"Duvar, ada çevresi ve kayalıklar kombinasyonu. Güçlü akıntısıyla ödüllendirici bir Kaş klasiği.", desc_en:"Wall, island circuit and rocky sections combined. A rewarding Kaş classic known for its strong currents." },
     { id:43, koridor:"Akdeniz", lat:36.18015, lng:29.86525, name:"Kekova Batıkşehir", name_en:"Kekova Sunken City", tur:["arkeoloji"], derinlik:"1–10m", seviye:"Tüm seviyeler", desc:"MS 2. yüzyıl depreminde batan antik kent. 1–10m derinlikte şnorkel ve kolay dalış alanı.", desc_en:"Ancient city submerged in a 2nd-century AD earthquake. Snorkelling and easy diving at 1–10m depth." },
-    { id:44, koridor:"Akdeniz", lat:36.19515, lng:29.65525, name:"Sualtı Heykel Parkı", name_en:"Underwater Sculpture Park", tur:["sanat"], derinlik:"5–12m", seviye:"Başlangıç", desc:"2006'da kurulan Türkiye'nin ilk sualtı heykel müzesi. Yaklaşık 50 eser, yapay resif işlevi görüyor.", desc_en:"Turkey's first underwater sculpture museum, founded in 2006. Around 50 artworks doubling as artificial reef." },
+    { id:44, koridor:"Akdeniz", lat:36.19515, lng:29.65525, name:"Sualtı Heykel Parkı", name_en:"Underwater Sculpture Park", tur:["sanat"], derinlik:"5–12m", seviye:"Başlangıç", desc:"2006'da kurulan Türkiye'nin ilk sualtı heykel müzesi. Yaklaşık 50 eser, yapay resif işlevi görüyor.", desc_en:"Türkiye's first underwater sculpture museum, founded in 2006. Around 50 artworks doubling as artificial reef." },
     { id:45, koridor:"Akdeniz", lat:36.59865, lng:30.58335, name:"Paris II Batığı", name_en:"Paris II Wreck", tur:["batik"], derinlik:"30–42m", seviye:"İleri", desc:"13.12.1917 tarihli Fransız savaş gemisi; 6 uçaksavar topu sağlam. Küresel en iyi 100 batık listesinde.", desc_en:"French warship dated 13.12.1917; 6 anti-aircraft guns intact. Listed among the world's top 100 wrecks." },
     { id:46, koridor:"Akdeniz", lat:36.80055, lng:30.59605, name:"Sıçan Adası", name_en:"Sican Island", tur:["resif","batik"], derinlik:"5–40m", seviye:"Orta", desc:"Kemer dalış turlarının gözde noktası. Resif ve çevresindeki batık kalıntıları; her seviyeye uygun.", desc_en:"A favourite on Kemer dive tours. Reef and surrounding wreck ruins; suitable for all levels." },
-    { id:47, koridor:"Akdeniz", lat:36.87785, lng:30.71115, name:"Didier Batığı", name_en:"Didier Wreck", tur:["batik"], derinlik:"30m", seviye:"İleri", desc:"96m WWII yük gemisi; içinde panzer ve gaz maskesi kalıntıları. Efsanevi batık.", desc_en:"96m WWII cargo ship with tank and gas mask remains inside. A legendary wreck." },
-    { id:48, koridor:"Akdeniz", lat:36.75815, lng:31.38525, name:"Side Sualtı Müzesi", name_en:"Side Underwater Museum", tur:["arkeoloji","sanat"], derinlik:"5–15m", seviye:"Tüm seviyeler", desc:"117 eserle Türkiye'nin en kapsamlı sualtı müzesi. Side antik limanı kıyısında kolay ve etkileyici dalış.", desc_en:"Turkey's most comprehensive underwater museum with 117 pieces. Easy and impressive diving beside the ancient port of Side." },
+    { id:47, koridor:"Akdeniz", lat:36.87785, lng:30.71115, name:"Didier Batığı", name_en:"Didier Wreck", tur:["batik"], derinlik:"30m", seviye:"İleri", desc:"96m İkinci Dünya Savaşı yük gemisi; içinde panzer ve gaz maskesi kalıntıları. Efsanevi batık.", desc_en:"96m WWII cargo ship with tank and gas mask remains inside. A legendary wreck." },
+    { id:48, koridor:"Akdeniz", lat:36.75815, lng:31.38525, name:"Side Sualtı Müzesi", name_en:"Side Underwater Museum", tur:["arkeoloji","sanat"], derinlik:"5–15m", seviye:"Tüm seviyeler", desc:"117 eserle Türkiye'nin en kapsamlı sualtı müzesi. Side antik limanı kıyısında kolay ve etkileyici dalış.", desc_en:"Türkiye's most comprehensive underwater museum with 117 pieces. Easy and impressive diving beside the ancient port of Side." },
     { id:49, koridor:"Akdeniz", lat:36.18515, lng:33.77525, name:"Mersin Dana Adası", name_en:"Dana Island", tur:["batik","arkeoloji"], derinlik:"10–30m", seviye:"Orta", gem:true, desc:"Dana Adası batı burnu; antik yağ kavanozu alanı. Az ziyaret edilen Mersin'in gizli arkeolojik hazinesi.", desc_en:"Western cape of Dana Island; ancient oil jar site. Mersin's little-visited hidden archaeological treasure." },
     { id:50, koridor:"Akdeniz", lat:36.06515, lng:35.95525, name:"Samandağ", name_en:"Samandag Reefs", tur:["resif"], derinlik:"5–40m", seviye:"Tüm seviyeler", gem:true, desc:"Kızıldeniz ekosistemine benzer nadir flora yapısı. Kışın 17–18°C su sıcaklığıyla yıl boyu dalış mümkün.", desc_en:"Rare marine flora resembling the Red Sea ecosystem. Year-round diving possible with 17–18°C winter water temps." },
     { id:57, koridor:"Akdeniz", lat:36.70015, lng:28.94025, name:"Göcek Körfezi", name_en:"Gocek Bay", tur:["resif","arkeoloji"], derinlik:"5–30m", seviye:"Tüm seviyeler", desc:"Saklı amphora alanları ve zengin orfoz habitatı. Göcek koylarının sualtı keşfedilmemiş köşeleri.", desc_en:"Hidden amphora sites and rich grouper habitat. Unexplored underwater corners of Göcek coves." },
     { id:58, koridor:"Akdeniz", lat:36.13415, lng:29.69625, name:"Uluburun Yakını", name_en:"Uluburun Vicinity", tur:["arkeoloji"], derinlik:"40–60m", seviye:"Teknik", gem:true, desc:"MÖ 1300 tarihli Uluburun enkazına yakın alan. Teknik + arkeoloji kombinasyonu; izin gerektirir.", desc_en:"Near the 1300 BC Uluburun wreck site. Technical + archaeology combo; permit required." },
     { id:59, koridor:"Akdeniz", lat:36.21015, lng:29.98025, name:"Demre Çevresi", name_en:"Demre Ancient Coast", tur:["arkeoloji"], derinlik:"2–20m", seviye:"Başlangıç", desc:"Likya medeniyeti suya gömülen liman kalıntıları. Kekova güzergahının tamamlayıcı arkeoloji durağı.", desc_en:"Submerged Lycian civilization harbor ruins. Complementary archaeology stop on the Kekova route." },
     { id:61, koridor:"Akdeniz", lat:36.35015, lng:30.47025, name:"Olimpos Sualtı", name_en:"Olympos Underwater", tur:["resif","arkeoloji"], derinlik:"5–30m", seviye:"Tüm seviyeler", desc:"Olimpos antik kentinin sulara gömülen kıyıları. Tarihî doku ve deniz yaşamı bir arada.", desc_en:"Sunken coastlines of ancient Olympos. Historical texture and marine life side by side." },
-    { id:51, koridor:"Karadeniz", lat:41.12055, lng:30.68005, name:"U20 Alman Denizaltısı", name_en:"U20 German Submarine", tur:["batik"], derinlik:"42.7m", seviye:"İleri", desc:"WWII'de Karadeniz'e nakledilen Alman U20 denizaltısı. 42.7m derinlikte tam yapısını koruyor.", desc_en:"German U20 submarine transferred to the Black Sea in WWII. Fully intact structure at 42.7m depth." },
+    { id:51, koridor:"Karadeniz", lat:41.12055, lng:30.68005, name:"U20 Alman Denizaltısı", name_en:"U20 German Submarine", tur:["batik"], derinlik:"42.7m", seviye:"İleri", desc:"İkinci Dünya Savaşı'nda Karadeniz'e nakledilen Alman U20 denizaltısı. 42.7m derinlikte tam yapısını koruyor.", desc_en:"German U20 submarine transferred to the Black Sea in WWII. Fully intact structure at 42.7m depth." },
     { id:52, koridor:"Karadeniz", lat:42.03015, lng:35.16025, name:"Sinop Sualtı Noktaları", name_en:"Sinop Dive Sites", tur:["resif","batik"], derinlik:"5–40m", seviye:"Orta", desc:"Volkanik zemin ve Karadeniz'in en iyi görüş mesafesi. Sinop Üniversitesi iş birliğiyle gelişmekte.", desc_en:"Volcanic ground and the Black Sea's best visibility. Developing in partnership with Sinop University." },
     { id:53, koridor:"Karadeniz", lat:41.46015, lng:31.78025, name:"Zonguldak Denizaltı", name_en:"Zonguldak Naval Wrecks", tur:["batik"], derinlik:"20–50m", seviye:"İleri", gem:true, desc:"BAKKA destekli keşif altyapısı geliştirilmekte. Tarihi deniz savaşı batıkları henüz tam envantere alınmadı.", desc_en:"BAKKA-supported exploration infrastructure developing. Historical naval battle wrecks not yet fully inventoried." },
     { id:54, koridor:"Karadeniz", lat:41.01015, lng:39.72025, name:"Trabzon – Gürgen", name_en:"Trabzon Gurgen Ferry", tur:["batik"], derinlik:"20–35m", seviye:"Orta", desc:"Karadeniz doğusunda bilinen batıklardan biri. DOKA hedefleriyle örtüşen gelişme potansiyeli yüksek nokta.", desc_en:"One of the known wrecks in eastern Black Sea. High development potential aligned with DOKA targets." },
@@ -760,38 +826,38 @@ try {
   // ── BÖLGE ETİKETLERİ VERİSİ ──
   const REGION_LABELS = [
     // Şehirler (zoom 5-6'da görünür)
-    { tr:"İSTANBUL", en:"ISTANBUL", lat:41.01, lng:28.95, type:"city" },
-    { tr:"İZMİR", en:"IZMIR", lat:38.42, lng:27.14, type:"city" },
+    { tr:"İSTANBUL", en:"İSTANBUL", lat:41.01, lng:28.95, type:"city" },
+    { tr:"İZMİR", en:"İZMİR", lat:38.42, lng:27.14, type:"city" },
     { tr:"ANTALYA", en:"ANTALYA", lat:36.89, lng:30.70, type:"city" },
-    { tr:"MUĞLA", en:"MUGLA", lat:37.21, lng:28.36, type:"city" },
-    { tr:"ÇANAKKALE", en:"CANAKKALE", lat:40.15, lng:26.40, type:"city" },
-    { tr:"BALIKESİR", en:"BALIKESIR", lat:39.65, lng:27.89, type:"city" },
-    { tr:"SİNOP", en:"SINOP", lat:42.02, lng:35.15, type:"city" },
+    { tr:"MUĞLA", en:"MUĞLA", lat:37.21, lng:28.36, type:"city" },
+    { tr:"ÇANAKKALE", en:"ÇANAKKALE", lat:40.15, lng:26.40, type:"city" },
+    { tr:"BALIKESİR", en:"BALIKESİR", lat:39.65, lng:27.89, type:"city" },
+    { tr:"SİNOP", en:"SİNOP", lat:42.02, lng:35.15, type:"city" },
     { tr:"TRABZON", en:"TRABZON", lat:41.00, lng:39.72, type:"city" },
-    { tr:"MERSİN", en:"MERSIN", lat:36.80, lng:34.63, type:"city" },
+    { tr:"MERSİN", en:"MERSİN", lat:36.80, lng:34.63, type:"city" },
     { tr:"HATAY", en:"HATAY", lat:36.20, lng:36.16, type:"city" },
     { tr:"SAKARYA", en:"SAKARYA", lat:40.77, lng:30.39, type:"city" },
     { tr:"ZONGULDAK", en:"ZONGULDAK", lat:41.45, lng:31.79, type:"city" },
     // İlçeler (zoom 7'de görünür)
     { tr:"Bodrum", en:"Bodrum", lat:37.03, lng:27.43, type:"district" },
-    { tr:"Kaş", en:"Kas", lat:36.20, lng:29.64, type:"district" },
+    { tr:"Kaş", en:"Kaş", lat:36.20, lng:29.64, type:"district" },
     { tr:"Fethiye", en:"Fethiye", lat:36.62, lng:29.11, type:"district" },
     { tr:"Marmaris", en:"Marmaris", lat:36.85, lng:28.27, type:"district" },
-    { tr:"Datça", en:"Datca", lat:36.73, lng:27.69, type:"district" },
-    { tr:"Çeşme", en:"Cesme", lat:38.32, lng:26.30, type:"district" },
-    { tr:"Ayvalık", en:"Ayvalik", lat:39.32, lng:26.70, type:"district" },
+    { tr:"Datça", en:"Datça", lat:36.73, lng:27.69, type:"district" },
+    { tr:"Çeşme", en:"Çeşme", lat:38.32, lng:26.30, type:"district" },
+    { tr:"Ayvalık", en:"Ayvalık", lat:39.32, lng:26.70, type:"district" },
     { tr:"Gelibolu", en:"Gallipoli", lat:40.42, lng:26.68, type:"district" },
     { tr:"Kemer", en:"Kemer", lat:36.60, lng:30.56, type:"district" },
     { tr:"Side", en:"Side", lat:36.77, lng:31.39, type:"district" },
-    { tr:"Gökova", en:"Gokova", lat:37.00, lng:28.15, type:"district" },
-    { tr:"Göcek", en:"Gocek", lat:36.74, lng:28.96, type:"district" },
+    { tr:"Gökova", en:"Gökova", lat:37.00, lng:28.15, type:"district" },
+    { tr:"Göcek", en:"Göcek", lat:36.74, lng:28.96, type:"district" },
     { tr:"Kalkan", en:"Kalkan", lat:36.26, lng:29.41, type:"district" },
     { tr:"Kekova", en:"Kekova", lat:36.18, lng:29.89, type:"district" },
     { tr:"Karasu", en:"Karasu", lat:41.11, lng:30.68, type:"district" },
-    { tr:"Şile", en:"Sile", lat:41.18, lng:29.61, type:"district" },
+    { tr:"Şile", en:"Şile", lat:41.18, lng:29.61, type:"district" },
     { tr:"Heybeliada", en:"Heybeliada", lat:40.87, lng:29.10, type:"district" },
-    { tr:"Prens Adaları", en:"Princes Islands", lat:40.87, lng:29.00, type:"district" },
-    { tr:"Kınalıada", en:"Kinaliada", lat:40.91, lng:29.05, type:"district" },
+    { tr:"Prens Adaları", en:"Prens Adaları", lat:40.87, lng:29.00, type:"district" },
+    { tr:"Kınalıada", en:"Kınalıada", lat:40.91, lng:29.05, type:"district" },
     // Deniz coğrafyası (zoom 8+)
     { tr:"EGE DENİZİ", en:"AEGEAN SEA", lat:38.5, lng:25.9, type:"geo" },
     { tr:"AKDENİZ", en:"MEDITERRANEAN", lat:36.3, lng:32.0, type:"geo" },
@@ -875,9 +941,12 @@ try {
             <div class="popup-koridor" style="color:${baseRegionColor}">${koridorLabel}</div>
             <div class="popup-name">${siteName} ${s.gem ? '💎' : ''}</div>
             <div class="popup-tags">${turTags}</div>
-            <div class="dist-badge" id="dist-${s.id}"></div>
+            <div class="dist-badge" id="dist-${s.id}" style="display:none;">${SVG.pin} <span></span></div>
             <div class="popup-desc">${descText}</div>
-            <div style="font-size:.75rem;color:#94a3b8;margin-bottom:8px;">${i18n[lang].depth}: <b style="color:#fff">${s.derinlik}</b> &nbsp;|&nbsp; ${i18n[lang].level}: <b style="color:#fff">${seviyeLabel}</b></div>
+            <div class="popup-stats">
+              <div class="popup-stat"><div class="popup-stat-label">${i18n[lang].depth}</div><div class="popup-stat-value">${s.derinlik}</div></div>
+              <div class="popup-stat"><div class="popup-stat-label">${i18n[lang].level}</div><div class="popup-stat-value">${seviyeLabel}</div></div>
+            </div>
             <div id="marine-${s.id}" class="marine-data">${i18n[lang].wait}</div>
             <div id="sb-${s.id}" class="search-bar-slot"></div>
           </div>`;
@@ -895,7 +964,7 @@ try {
         if (userLatLng) {
           const dist = (userLatLng.distanceTo([s.lat, s.lng]) / 1000).toFixed(1);
           const dBox = document.getElementById(`dist-${s.id}`);
-          if (dBox) { dBox.style.display = 'inline-block'; dBox.innerText = `📍 ${i18n[lang].dist}: ${dist} km`; }
+          if (dBox) { dBox.style.display = 'flex'; const sp = dBox.querySelector('span'); if(sp) sp.textContent = `${i18n[lang].dist}: ${dist} km`; }
         }
 
         // Hava + deniz verisi
@@ -909,21 +978,21 @@ try {
           let html = '';
           if (wRes.ok) {
             const w = (await wRes.json()).current_weather;
-            html += `<div class="md-row"><span>🌡️ Hava:</span><span>${w.temperature}°C</span></div>`;
-            html += `<div class="md-row"><span>💨 Rüzgar:</span><span>${w.windspeed} km/s</span></div>`;
+            html += `<div class="md-row"><span>${i18n[lang].marine_temp}:</span><span>${w.temperature}°C</span></div>`;
+            html += `<div class="md-row"><span>${i18n[lang].marine_wind}:</span><span>${w.windspeed} km/s</span></div>`;
           }
           if (mRes.ok) {
             const md = (await mRes.json()).current;
             if (md) {
-              if (md.sea_surface_temperature != null) html += `<div class="md-row"><span>🌊 Deniz:</span><span>${md.sea_surface_temperature.toFixed(1)}°C</span></div>`;
-              if (md.wave_height != null) html += `<div class="md-row"><span>🌀 Dalga:</span><span>${md.wave_height.toFixed(1)} m</span></div>`;
-              if (md.wave_period != null) html += `<div class="md-row"><span>⏱️ Periyot:</span><span>${md.wave_period.toFixed(0)} sn</span></div>`;
+              if (md.sea_surface_temperature != null) html += `<div class="md-row"><span>${i18n[lang].marine_sea}:</span><span>${md.sea_surface_temperature.toFixed(1)}°C</span></div>`;
+              if (md.wave_height != null) html += `<div class="md-row"><span>${i18n[lang].marine_wave}:</span><span>${md.wave_height.toFixed(1)} m</span></div>`;
+              if (md.wave_period != null) html += `<div class="md-row"><span>${i18n[lang].marine_period}:</span><span>${md.wave_period.toFixed(0)} sn</span></div>`;
             }
           }
-          b.innerHTML = html || '<span style="opacity:.5">Veri yok</span>';
+          b.innerHTML = html || `<span style="opacity:.5">${i18n[lang].no_data}</span>`;
         } catch(e) {
           const b = document.getElementById(`marine-${s.id}`);
-          if (b) b.innerHTML = '<span style="opacity:.5">Bağlantı hatası</span>';
+          if (b) b.innerHTML = `<span style="opacity:.5">${i18n[lang].conn_error}</span>`;
         }
       });
       m.addTo(siteLayer);
@@ -937,17 +1006,17 @@ try {
       const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(sName + ' ' + sAddr)}/@${sc.lat},${sc.lng},15z`;
       const pop = `
         <div class="popup-inner">
-          <div class="popup-koridor" style="color:#e74c3c">OKUL & TESİS</div>
+          <div class="popup-koridor" style="color:#e74c3c">${i18n[lang].school_type}</div>
           <div class="popup-title">${sName}</div>
           ${sc.cert ? `<span class="cert-badge">${sc.cert}</span>` : ''}
-          <div style="font-size:.78rem;color:#3a6a8a;margin:5px 0 8px;">${sAddr}</div>
-          ${sc.phone ? `<div style="font-size:.78rem;margin-bottom:4px;">📞 <a href="tel:${sc.phone.replace(/ /g,'')}" style="color:var(--teal);text-decoration:none;">${sc.phone}</a></div>` : ''}
-          ${sc.web ? `<div style="font-size:.78rem;margin-bottom:6px;">🌐 <a href="https://${sc.web}" target="_blank" style="color:var(--teal);text-decoration:none;">${sc.web}</a></div>` : ''}
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
-            <a class="photo-search-btn" style="font-size:.72rem;padding:6px 9px;" href="${mapsUrl}" target="_blank">📍 Google Maps</a>
-            ${sc.tdv ? `<a class="photo-search-btn" style="font-size:.72rem;padding:6px 9px;" href="${sc.tdv}" target="_blank">⭐ Tripadvisor</a>` : ''}
+          ${sAddr ? `<div class="popup-info-row" style="margin:5px 0 6px;">${SVG.pin} <span style="color:#3a6a8a">${sAddr}</span></div>` : ''}
+          ${sc.phone ? `<div class="popup-info-row">${SVG.phone} <a href="tel:${sc.phone.replace(/ /g,'')}">${sc.phone}</a></div>` : ''}
+          ${sc.web ? `<div class="popup-info-row">${SVG.globe} <a href="https://${sc.web}" target="_blank">${sc.web}</a></div>` : ''}
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;">
+            <a class="photo-search-btn" style="font-size:.72rem;padding:6px 9px;" href="${mapsUrl}" target="_blank">${SVG.pin} Google Maps</a>
+            ${sc.tdv ? `<a class="photo-search-btn" style="font-size:.72rem;padding:6px 9px;" href="${sc.tdv}" target="_blank">${SVG.star} Tripadvisor</a>` : ''}
           </div>
-          <div class="dist-badge" id="dist-${sc.id}" style="margin-top:6px;"></div>
+          <div class="dist-badge" id="dist-${sc.id}" style="display:none;margin-top:6px;">${SVG.pin} <span></span></div>
         </div>`;
       L.marker([sc.lat, sc.lng], {icon}).bindPopup(pop).addTo(schoolLayer);
     });
@@ -967,12 +1036,12 @@ try {
     const diveCtrUrl= `https://www.google.com/maps/search/${encodeURIComponent('dalış merkezi dive center')}/@${lat},${lng},12z`;
     wrap.innerHTML = `
       <div class="photo-search-bar">
-        <a class="photo-search-btn" href="${gImgUrl}" target="_blank"><span class="btn-icon">🖼</span> Görseller</a>
-        <a class="photo-search-btn" href="${gImgUrlEn}" target="_blank"><span class="btn-icon">🖼</span> Photos</a>
-        <a class="photo-search-btn" href="${ytUrl}" target="_blank"><span class="btn-icon">▶</span> YouTube</a>
-        <a class="photo-search-btn" href="${mapsUrl}" target="_blank"><span class="btn-icon">📍</span> Google Maps</a>
-        <a class="photo-search-btn" style="grid-column:1/-1;font-size:.75rem;padding:9px;" href="${diveCtrUrl}" target="_blank"><span class="btn-icon">⚓</span> Yakın Dalış Merkezleri / Dive Centers</a>
-        <span class="photo-search-label">Fotoğraf henüz eklenmedi</span>
+        <a class="photo-search-btn" href="${gImgUrl}" target="_blank">${SVG.image} ${i18n[lang].photos_tr}</a>
+        <a class="photo-search-btn" href="${gImgUrlEn}" target="_blank">${SVG.image} ${i18n[lang].photos_en}</a>
+        <a class="photo-search-btn" href="${ytUrl}" target="_blank">${SVG.play} YouTube</a>
+        <a class="photo-search-btn" href="${mapsUrl}" target="_blank">${SVG.pin} Google Maps</a>
+        <a class="photo-search-btn" style="grid-column:1/-1;font-size:.75rem;padding:9px;" href="${diveCtrUrl}" target="_blank">${SVG.anchor} ${i18n[lang].nearby_centers}</a>
+        <span class="photo-search-label">${i18n[lang].photos_label}</span>
       </div>`;
   }
 
@@ -1055,10 +1124,10 @@ try {
       groups[k].forEach(s => {
         let meta = "";
         const sName = lang === 'en' && s.name_en ? s.name_en : s.name;
-        if(isSchoolView) { meta = `📞 ${s.phone}`; } 
+        if(isSchoolView) { meta = `${SVG.phone} ${s.phone}`; }
         else {
-          const seviyeLabel = lang === 'en' ? (dictSeviye[s.seviye] || s.seviye) : i18n[lang].level + ": " + s.seviye;
-          meta = `⬇ ${s.derinlik} - ⚓ ${seviyeLabel}`;
+          const seviyeLabel = lang === 'en' ? (dictSeviye[s.seviye] || s.seviye) : s.seviye;
+          meta = `${SVG.arrowDown} ${s.derinlik} &nbsp;·&nbsp; ${seviyeLabel}`;
         }
         html += `<div class="site-item" data-id="${s.id}" onclick="selectSite('${s.id}', ${s.lat}, ${s.lng})">
           <div class="site-item-name">${sName} ${s.gem?'💎':''}</div>
@@ -1104,13 +1173,13 @@ try {
     if (seaMapActive) {
       seaMapLayer.addTo(map);
       if (map.getZoom() < 10) {
-        showToast('🌊 Denizcilik haritası zoom 10+ seviyesinde görünür — yaklaştırın');
+        showToast(i18n[lang].sea_map_zoom);
       } else {
-        showToast('🌊 Denizcilik haritası katmanı açıldı');
+        showToast(i18n[lang].sea_map_open);
       }
     } else {
       map.removeLayer(seaMapLayer);
-      showToast('Denizcilik haritası kapatıldı');
+      showToast(i18n[lang].sea_map_close);
     }
   });
 
@@ -1137,6 +1206,41 @@ try {
     document.querySelectorAll('.dd-wrap.open').forEach(w => w.classList.remove('open'));
   });
 
+  // ── DROPDOWN UI GÜNCELLEME ──
+  function updateDropdownLabels() {
+    const t = i18n[lang];
+    // Derinlik trigger başlığı (filtre seçili değilse)
+    if (!activeDepth) document.getElementById('depthTriggerLabel').textContent = t.depth_label;
+    // Seviye trigger başlığı (filtre seçili değilse)
+    if (!activeLevel) document.getElementById('levelTriggerLabel').textContent = t.level_label;
+    // Dropdown menü başlıkları
+    document.getElementById('depthMenuHeader').textContent = t.depth_header;
+    document.getElementById('levelMenuHeader').textContent = t.level_header;
+    // Derinlik item'ları
+    document.getElementById('dd-shallow').innerHTML = `${t.shallow} <span style="opacity:.5;font-size:.75rem">${t.shallow_range}</span>`;
+    document.getElementById('dd-mid').innerHTML = `${t.mid} <span style="opacity:.5;font-size:.75rem">${t.mid_range}</span>`;
+    document.getElementById('dd-deep').innerHTML = `${t.deep} <span style="opacity:.5;font-size:.75rem">${t.deep_range}</span>`;
+    document.getElementById('dd-depth-clear').textContent = t.clear_filter;
+    // Seviye item'ları
+    document.getElementById('dd-beginner').textContent = t.lv_easy;
+    document.getElementById('dd-intermediate').textContent = t.lv_med;
+    document.getElementById('dd-advanced').textContent = t.lv_hard;
+    document.getElementById('dd-level-clear').textContent = t.clear_filter;
+    // Sea map butonu
+    document.getElementById('seaMapLabel').textContent = t.sea_map;
+    // Eğer filtre seçiliyse trigger text'i güncelle
+    if (activeDepth) {
+      const depthKeyMap = { shallow: 'shallow', mid: 'mid', deep: 'deep' };
+      const key = depthKeyMap[activeDepth];
+      if (key) document.getElementById('depthTriggerLabel').textContent = `${t[key]} ${t[key+'_range']}`;
+    }
+    if (activeLevel) {
+      const levelKeyMap = { beginner: 'lv_easy', intermediate: 'lv_med', advanced: 'lv_hard' };
+      const key = levelKeyMap[activeLevel];
+      if (key) document.getElementById('levelTriggerLabel').textContent = t[key];
+    }
+  }
+
   // ── DİL DROPDOWN ──
   setupDropdown('langDDWrap', item => {
     const newLang = item.dataset.lang;
@@ -1158,42 +1262,44 @@ try {
     document.getElementById('f-reef').innerText = i18n[lang].reef;
     document.getElementById('f-cave').innerText = i18n[lang].cave;
     document.getElementById('search').placeholder = i18n[lang].search;
+    updateDropdownLabels();
     renderBadges(); drawMap(); renderSidebar(); map.closePopup();
   });
 
   // ── DERİNLİK DROPDOWN ──
-  const depthLabels = { shallow:'🏊 Sığ ≤18m', mid:'🤿 Orta 18–30m', deep:'⚙️ Derin 30m+', all:null };
   setupDropdown('depthDDWrap', item => {
     const val = item.dataset.depth;
     if (val === 'all') {
       activeDepth = null;
       document.querySelectorAll('#depthMenu .dd-item').forEach(i => i.classList.remove('active'));
-      document.getElementById('depthTrigger').innerHTML = '⬇ Derinlik <span class="dd-arrow">▼</span>';
+      document.getElementById('depthTriggerLabel').textContent = i18n[lang].depth_label;
       document.getElementById('depthTrigger').classList.remove('has-filter');
     } else {
       activeDepth = val;
       document.querySelectorAll('#depthMenu .dd-item').forEach(i => i.classList.remove('active'));
       item.classList.add('active');
-      document.getElementById('depthTrigger').innerHTML = depthLabels[val] + ' <span class="dd-arrow">▼</span>';
+      const depthKeyMap = { shallow: 'shallow', mid: 'mid', deep: 'deep' };
+      const key = depthKeyMap[val];
+      document.getElementById('depthTriggerLabel').textContent = `${i18n[lang][key]} ${i18n[lang][key+'_range']}`;
       document.getElementById('depthTrigger').classList.add('has-filter');
     }
     drawMap(); renderSidebar();
   });
 
   // ── SEVİYE DROPDOWN ──
-  const levelLabels = { beginner:'🟢 Başlangıç', intermediate:'🟡 Orta', advanced:'🔴 İleri/Teknik', all:null };
   setupDropdown('levelDDWrap', item => {
     const val = item.dataset.level;
     if (val === 'all') {
       activeLevel = null;
       document.querySelectorAll('#levelMenu .dd-item').forEach(i => i.classList.remove('active'));
-      document.getElementById('levelTrigger').innerHTML = '⚑ Seviye <span class="dd-arrow">▼</span>';
+      document.getElementById('levelTriggerLabel').textContent = i18n[lang].level_label;
       document.getElementById('levelTrigger').classList.remove('has-filter');
     } else {
       activeLevel = val;
       document.querySelectorAll('#levelMenu .dd-item').forEach(i => i.classList.remove('active'));
       item.classList.add('active');
-      document.getElementById('levelTrigger').innerHTML = levelLabels[val] + ' <span class="dd-arrow">▼</span>';
+      const levelKeyMap = { beginner: 'lv_easy', intermediate: 'lv_med', advanced: 'lv_hard' };
+      document.getElementById('levelTriggerLabel').textContent = i18n[lang][levelKeyMap[val]];
       document.getElementById('levelTrigger').classList.add('has-filter');
     }
     drawMap(); renderSidebar();
@@ -1212,6 +1318,7 @@ try {
   handleZoom();
   drawRegionLabels();
   renderBadges();
+  updateDropdownLabels();
   drawMap();
   renderSidebar();
 
