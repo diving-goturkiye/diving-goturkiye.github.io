@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Türkiye Dalış Rehberi Pro</title>
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --navy: #09131f; --teal: #1A7A8A; --teal-glow: rgba(26,122,138,0.5);
+    --c1: #3498db; --c2: #2ecc71; --c3: #ff4757; --c4: #9b59b6; --c5: #e67e22; --gold: #f1c40f;
+    --diff-easy: #2ecc71; --diff-med: #f39c12; --diff-hard: #e74c3c;
+    --icon-scale: 0.55; 
+    --site-label-size: 1.4rem; /* Dinamik punto için CSS değişkeni */
+  }
+  
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--navy); color: #fff; font-family: 'Source Sans 3', sans-serif; }
+  body { display: flex; flex-direction: column; }
+
+  /* ── HEADER ── */
+  .header { flex-shrink: 0; background: rgba(9, 19, 31, 0.95); padding: 15px 30px; border-bottom: 1px solid var(--teal); box-shadow: 0 4px 15px var(--teal-glow); z-index: 100; display:flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;}
+  .header-title h1 { font-family:'Playfair Display',serif; font-size:1.6rem; margin:0; }
+  .header-title h1 span { color: var(--teal); }
+  .header-title p { font-size:.8rem; color:#a0b8cc; margin:4px 0 0 0; }
+  
+  .top-tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;}
+  
+  .badge-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .badge { display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:15px; font-size:.7rem; font-weight:600; background:rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); transition: all 0.3s ease;}
+  .badge-dot { width:8px; height:8px; border-radius:50%; }
+
+  .tool-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--teal); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; font-weight: 600;}
+  .tool-btn.active { background: var(--teal); box-shadow: 0 0 10px var(--teal-glow); border-color: #fff;}
+  
+  @media (hover: hover) {
+    .tool-btn:hover { background: var(--teal); box-shadow: 0 0 10px var(--teal-glow); }
+  }
+  
+  /* ── CUSTOM DROPDOWN ── */
+  .dd-wrap { position: relative; display: inline-block; }
+  .dd-trigger { display:flex; align-items:center; gap:7px; padding:6px 14px; border:1px solid var(--teal); border-radius:20px; background:rgba(255,255,255,0.07); color:#fff; font-size:.8rem; font-weight:600; cursor:pointer; transition:0.2s; white-space:nowrap; user-select:none; }
+  .dd-trigger:hover { background:rgba(26,122,138,0.25); }
+  .dd-trigger .dd-arrow { font-size:.6rem; opacity:.7; transition:transform 0.2s; margin-left:2px; }
+  .dd-wrap.open .dd-trigger { background:rgba(26,122,138,0.3); border-color:#fff; }
+  .dd-wrap.open .dd-arrow { transform:rotate(180deg); }
+  .dd-menu { position:absolute; top:calc(100% + 6px); left:0; min-width:170px; background:rgba(9,19,31,0.98); border:1px solid var(--teal); border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.6); z-index:9999; overflow:hidden; opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity 0.18s, transform 0.18s; }
+  .dd-wrap.open .dd-menu { opacity:1; transform:translateY(0); pointer-events:all; }
+  .dd-item { display:flex; align-items:center; gap:9px; padding:10px 16px; font-size:.82rem; font-weight:600; color:#c8d8e8; cursor:pointer; transition:background 0.15s; }
+  .dd-item:hover { background:rgba(26,122,138,0.25); color:#fff; }
+  .dd-item.active { color:#7ed6f7; background:rgba(14,77,110,0.5); }
+  .dd-item .dd-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .dd-item .dd-flag { font-size:1.1rem; line-height:1; }
+  .dd-divider { height:1px; background:rgba(255,255,255,.07); margin:4px 0; }
+  .dd-header { padding:7px 16px 4px; font-size:.65rem; text-transform:uppercase; letter-spacing:.08em; color:#4a7a9b; font-weight:700; }
+  /* aktif filtre varsa trigger teal'e dönsün */
+  .dd-trigger.has-filter { background:rgba(14,77,110,0.5); border-color:#7ed6f7; color:#7ed6f7; }
+
+  /* ── DEPTH FILTER (artık dropdown içinde kullanılmıyor, eski butonlar kaldı yedek) ── */
+  .depth-sep { width:1px; height:20px; background:rgba(255,255,255,.12); margin:0 2px; }
+
+  /* ── FILTERS ── */
+  .filters { flex-shrink: 0; background: rgba(9, 19, 31, 0.8); border-bottom:1px solid rgba(255,255,255,.05); padding:10px 30px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; z-index: 90;}
+  .filter-btn { padding:6px 14px; border-radius:15px; border:1px solid rgba(255,255,255,.2); background:rgba(0,0,0,0.3); color:#e0e0e0; font-size:.8rem; cursor:pointer; font-weight:600; transition:0.2s;}
+  .filter-btn.active { background:var(--teal); border-color:var(--teal); }
+  
+  .search-wrap { margin-left:auto; }
+  .search-wrap input { background:rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.2); color:#fff; padding:6px 14px; border-radius:15px; outline:none; width:180px; transition: 0.3s; }
+
+  /* ── TOAST ── */
+  #toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(9,19,31,0.96); border:1px solid var(--teal); color:#a8d8e8; font-size:.82rem; font-weight:600; padding:10px 22px; border-radius:20px; z-index:9999; opacity:0; transition:opacity 0.3s, transform 0.3s; pointer-events:none; white-space:nowrap; }
+  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ── MAIN AREA & SMOKE EFFECT ── */
+  .main { flex: 1; display: flex; position: relative; overflow: hidden; }
+  #map { flex: 1; background: #000; z-index: 1; }
+  
+
+
+  /* ── KADEMELİ BİLGİ ETİKETLERİ (Tamamen Doğal Harita Görünümü) ── */
+  .map-label-city {
+    background: transparent; border: none; box-shadow: none;
+    color: #fff;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0px 2px 5px rgba(0,0,0,0.8);
+    text-align: center; white-space: nowrap;
+    opacity: 0 !important; transition: opacity 0.5s ease-in-out;
+    pointer-events: none !important;
+  }
+  .map-label-district {
+    background: transparent; border: none; box-shadow: none;
+    color: #e2e8f0;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    text-align: center; white-space: nowrap;
+    opacity: 0 !important; transition: opacity 0.5s ease-in-out;
+    pointer-events: none !important;
+  }
+  .map-label-geo {
+    background: transparent; border: none; box-shadow: none;
+    color: #94a3b8;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.8rem;
+    font-style: italic;
+    font-weight: 600;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    text-align: center; white-space: nowrap;
+    opacity: 0 !important; transition: opacity 0.5s ease-in-out;
+    pointer-events: none !important;
+  }
+
+  /* Dalış Noktası Etiketleri (Zoom in ile dinamik küçülür) */
+  .map-label-site {
+    background: transparent !important; border: none !important; box-shadow: none !important;
+    color: #fff !important;
+    font-family: 'Source Sans 3', sans-serif !important;
+    font-size: var(--site-label-size) !important;
+    font-weight: 700 !important;
+    text-shadow: 0px 2px 4px rgba(0,0,0,1), 0px 0px 4px rgba(0,0,0,0.8) !important;
+    margin-top: 15px !important;
+    opacity: 0 !important; 
+    transition: opacity 0.3s ease-in-out, font-size 0.2s ease-out !important;
+    pointer-events: none !important;
+  }
+  .map-label-site::before { display: none !important; }
+
+  /* Zoom Seviyesine Göre Görünürlük */
+  #map.show-sites .map-label-site { opacity: 1 !important; }
+  #map.show-cities .map-label-city { opacity: 1 !important; }
+  #map.show-districts .map-label-district { opacity: 1 !important; }
+  #map.show-geo .map-label-geo { opacity: 1 !important; }
+
+  .dynamic-svg {
+    transform: scale(var(--icon-scale));
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center center;
+    filter: drop-shadow(0px 0px 4px rgba(255,255,255,0.4)) drop-shadow(0px 4px 6px rgba(0,0,0,0.8));
+  }
+
+  /* ── DETAIL PANEL (Leaflet popup yerine sabit panel) ── */
+  #detail-panel {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 310px;
+    max-height: calc(100vh - 180px);
+    background: rgba(9,19,31,0.97);
+    border: 1px solid var(--teal);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+    transform: translateX(-360px);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    pointer-events: none;
+  }
+  #detail-panel.open {
+    transform: translateX(0);
+    pointer-events: all;
+  }
+  #detail-panel-body {
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: var(--teal) rgba(0,0,0,0.2);
+  }
+  #detail-panel-body::-webkit-scrollbar { width: 4px; }
+  #detail-panel-body::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+  #detail-panel-body::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 2px; }
+  #detail-close {
+    position: absolute;
+    top: 8px; right: 10px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff;
+    border-radius: 50%;
+    width: 26px; height: 26px;
+    font-size: .85rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+    transition: background 0.15s;
+  }
+  #detail-close:hover { background: rgba(231,76,60,0.6); }
+
+  .popup-body { padding: 12px; }
+  .popup-koridor { font-size:.7rem; font-weight:700; text-transform:uppercase; margin-bottom:4px; }
+  .popup-name { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:900; margin-bottom:6px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; padding-right: 24px; }
+  .popup-tag { font-size:.65rem; font-weight:600; padding:2px 6px; border-radius:10px; background:rgba(255,255,255,.1); margin-right: 4px; display: inline-block; margin-bottom: 4px; }
+  .popup-desc { font-size:.8rem; line-height:1.4; color:#cbd5e1; margin-bottom: 10px;}
+  .dist-badge { background: rgba(46, 204, 113, 0.2); border: 1px dashed #2ecc71; color: #2ecc71; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; display: none;}
+  .cert-badge { display:inline-block; background:rgba(231,76,60,.15); border:1px solid rgba(231,76,60,.35); color:#e74c3c; font-size:.62rem; font-weight:600; padding:2px 7px; border-radius:10px; margin-bottom:4px; letter-spacing:.3px; }
+  .marine-data { background: rgba(0,0,0,0.4); border-radius: 6px; padding: 8px; font-size: 0.75rem; margin-bottom: 8px; }
+  .md-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 3px; margin-bottom: 3px; }
+  .photo-search-bar { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding: 10px 12px 12px; background: #071320; border-top: 1px solid rgba(255,255,255,.07); }
+  .photo-search-btn { display:flex; align-items:center; justify-content:center; gap:5px; padding:9px 8px; border-radius:6px; border: 1px solid rgba(255,255,255,.1); font-size:.78rem; font-weight:500; cursor:pointer; text-decoration:none; white-space:nowrap; color:#e8eef4; background:rgba(255,255,255,.06); transition: background .15s, border-color .15s; }
+  .photo-search-btn:hover { background:rgba(255,255,255,.13); border-color:rgba(255,255,255,.22); color:#fff; }
+  .photo-search-btn span.btn-icon { font-size:.85rem; opacity:.85; }
+  .photo-search-label { grid-column:1/-1; font-size:.6rem; color:#2e5470; text-align:center; margin-top:2px; font-style:italic; }
+
+  @media(max-width:768px) {
+    #detail-panel { left: 10px; right: 10px; width: auto; bottom: 10px; max-height: 50vh; transform: translateY(110%); }
+    #detail-panel.open { transform: translateY(0); }
+  }
+
+  .locate-btn { position: absolute; bottom: 25px; right: 375px; z-index: 1000; width: 44px; height: 44px; background: rgba(9, 19, 31, 0.9); border: 2px solid var(--teal); border-radius: 50%; color: var(--teal); cursor: pointer; font-size: 20px; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px var(--teal-glow); transition: 0.2s;}
+  .locate-btn:active { transform: scale(0.9); }
+
+  /* ── SIDEBAR ── */
+  .sidebar { width: 350px; background: rgba(9, 19, 31, 0.98); overflow-y: auto; border-left: 1px solid var(--teal); z-index: 2; }
+  .sidebar-section-header { padding:14px 20px; display:flex; align-items:center; gap:10px; cursor: pointer; background:#09131f; border-bottom:1px solid rgba(255,255,255,.1); position: sticky; top: 0;}
+  .ssh-title { font-family:'Playfair Display',serif; font-size:.95rem; font-weight:700; flex:1; }
+  .ssh-count { font-size:.7rem; background:rgba(26,122,138,.3); padding:2px 6px; border-radius:8px; font-weight: 600; color:#fff; }
+  .sidebar-section.expanded .ssh-toggle { transform: rotate(180deg); color: var(--teal); }
+  .sidebar-section-content { display: none; }
+  .sidebar-section.expanded .sidebar-section-content { display: block; }
+  .site-item { padding:12px 20px; cursor:pointer; border-bottom: 1px solid rgba(255,255,255,.03); border-left:4px solid transparent; transition: 0.2s;}
+  .site-item:active { background:rgba(26,122,138,.1); }
+  .site-item.highlighted { border-left-color:var(--teal); background:rgba(26,122,138,.2); }
+  .site-item-name { font-size:.85rem; font-weight:600; margin-bottom: 4px; color: #e2e8f0;}
+  .site-item-meta { font-size:.7rem; color:#94a3b8; display: flex; gap: 8px;}
+
+  @media(max-width:768px) { 
+    .header { padding: 15px 20px; flex-direction: column; align-items: flex-start; }
+    .top-tools { width: 100%; justify-content: space-between; }
+    .badge-row { width: 100%; margin-bottom: 5px; }
+    .main { flex-direction:column; } 
+    .sidebar { width:100%; height: 40vh; } 
+    .locate-btn { bottom: 42vh; right: 15px; } 
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">
+    <h1 id="ui-title">Türkiye <span>Dalış Noktaları</span></h1>
+    <p id="ui-subtitle">Gerçek Koordinatlı Dalış Envanteri</p>
+  </div>
+  <div class="top-tools">
+    <div class="badge-row" id="badge-row"></div>
+    <button class="tool-btn" id="seaMapToggle" title="Denizcilik Haritası Katmanını Aç/Kapat">🌊 Deniz Haritası</button>
+    <div class="dd-wrap" id="langDDWrap">
+      <div class="dd-trigger" id="langTrigger">
+        <span id="langFlag"><svg width="20" height="14" viewBox="0 0 30 20" style="border-radius:2px;vertical-align:middle"><rect width="30" height="20" fill="#E30A17"/><circle cx="10.5" cy="10" r="6" fill="#fff"/><circle cx="12" cy="10" r="4.8" fill="#E30A17"/><polygon points="16.5,10 18.5,8.8 18.5,11.2" fill="#fff"/><polygon points="17.5,7.5 20.5,10 17.5,12.5 18.5,10" fill="#fff"/></svg></span>
+        <span id="langLabel">TR</span>
+        <span class="dd-arrow">▼</span>
+      </div>
+      <div class="dd-menu" id="langMenu">
+        <div class="dd-item active" data-lang="tr">
+          <svg width="20" height="14" viewBox="0 0 30 20" style="border-radius:2px;flex-shrink:0"><rect width="30" height="20" fill="#E30A17"/><circle cx="10.5" cy="10" r="6" fill="#fff"/><circle cx="12" cy="10" r="4.8" fill="#E30A17"/><polygon points="16.5,10 18.5,8.8 18.5,11.2" fill="#fff"/><polygon points="17.5,7.5 20.5,10 17.5,12.5 18.5,10" fill="#fff"/></svg>
+          Türkçe
+        </div>
+        <div class="dd-item" data-lang="en">
+          <svg width="20" height="14" viewBox="0 0 60 40" style="border-radius:2px;flex-shrink:0"><rect width="60" height="40" fill="#012169"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="3.5"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="6"/></svg>
+          English
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" data-filter="all" id="f-all">Tümü</button>
+  <button class="filter-btn" data-filter="batik" id="f-wreck">⚓ Batık</button>
+  <button class="filter-btn" data-filter="resif" id="f-reef">🪸 Resif</button>
+  <button class="filter-btn" data-filter="magara" id="f-cave">🕳️ Mağara</button>
+  <div class="depth-sep"></div>
+
+  <!-- Derinlik Dropdown -->
+  <div class="dd-wrap" id="depthDDWrap">
+    <div class="dd-trigger" id="depthTrigger">⬇ Derinlik <span class="dd-arrow">▼</span></div>
+    <div class="dd-menu" id="depthMenu">
+      <div class="dd-header">Maksimum Derinlik</div>
+      <div class="dd-item" data-depth="shallow"><span class="dd-dot" style="background:#2ecc71"></span>🏊 Sığ <span style="opacity:.55;font-size:.75rem;margin-left:4px">≤ 18m</span></div>
+      <div class="dd-item" data-depth="mid"><span class="dd-dot" style="background:#f39c12"></span>🤿 Orta <span style="opacity:.55;font-size:.75rem;margin-left:4px">18 – 30m</span></div>
+      <div class="dd-item" data-depth="deep"><span class="dd-dot" style="background:#e74c3c"></span>⚙️ Derin <span style="opacity:.55;font-size:.75rem;margin-left:4px">30m +</span></div>
+      <div class="dd-divider"></div>
+      <div class="dd-item" data-depth="all" id="depthClear" style="color:#4a7a9b;font-size:.75rem">✕ Filtreyi Kaldır</div>
+    </div>
+  </div>
+
+  <!-- Seviye Dropdown -->
+  <div class="dd-wrap" id="levelDDWrap">
+    <div class="dd-trigger" id="levelTrigger">⚑ Seviye <span class="dd-arrow">▼</span></div>
+    <div class="dd-menu" id="levelMenu">
+      <div class="dd-header">Dalış Seviyesi</div>
+      <div class="dd-item" data-level="beginner"><span class="dd-dot" style="background:#2ecc71"></span>🟢 Başlangıç</div>
+      <div class="dd-item" data-level="intermediate"><span class="dd-dot" style="background:#f39c12"></span>🟡 Orta</div>
+      <div class="dd-item" data-level="advanced"><span class="dd-dot" style="background:#e74c3c"></span>🔴 İleri / Teknik</div>
+      <div class="dd-divider"></div>
+      <div class="dd-item" data-level="all" id="levelClear" style="color:#4a7a9b;font-size:.75rem">✕ Filtreyi Kaldır</div>
+    </div>
+  </div>
+
+  <div class="search-wrap"><input type="text" id="search" placeholder="Nokta ara..."></div>
+</div>
+
+<div id="toast"></div>
+
+<div class="main">
+  <div id="map"></div>
+  <div id="detail-panel">
+    <button id="detail-close" onclick="closeDetailPanel()">✕</button>
+    <div id="detail-panel-body"></div>
+  </div>
+  <button class="locate-btn" id="locateBtn" title="Konumumu Bul">🎯</button>
+  <div class="sidebar" id="sidebar-content"></div>
+</div>
+
+<script>
+try {
+  let lang = 'tr';
+  let userLatLng = null;
+
+  const i18n = {
+    tr: { 
+      title: "Türkiye <span>Dalış Noktaları</span>", sub: "Gerçek Koordinatlı Dalış Envanteri", diff: "Zorluk Modu", 
+      all: "Tümü", wreck: "⚓ Batık", reef: "🪸 Resif", cave: "🕳️ Mağara", school: "🤿 Okullar & Tesisler", search: "Arama yap...", 
+      wait: "Deniz Verisi Bekleniyor...", depth: "Derinlik", level: "Seviye", dist: "Sana Uzaklık", weather: "Hava", wind: "Rüzgar", 
+      address: "Adres", phone: "Telefon", web: "Web", auth: "TSSF Belge No", here: "Buradasınız!", gem: "Gizli Cevher", 
+      c_can: "Çanakkale", c_mar: "Marmara", c_ege: "Ege", c_akd: "Akdeniz", c_kar: "Karadeniz",
+      lv_easy: "Başlangıç", lv_med: "Orta", lv_hard: "İleri/Teknik"
+    },
+    en: { 
+      title: "Türkiye <span>Dive Sites</span>", sub: "Real Coordinate Diving Inventory & Centers", diff: "Difficulty View", 
+      all: "All", wreck: "⚓ Wrecks", reef: "🪸 Reefs", cave: "🕳️ Caves", school: "🤿 Dive Centers", search: "Search sites...", 
+      wait: "Loading Marine Data...", depth: "Depth", level: "Skill Level", dist: "Distance to you", weather: "Weather", wind: "Wind", 
+      address: "Address", phone: "Phone", web: "Website", auth: "TSSF License ID", here: "You are here!", gem: "Hidden Gem",
+      c_can: "Canakkale", c_mar: "Marmara", c_ege: "Aegean", c_akd: "Mediterranean", c_kar: "Black Sea",
+      lv_easy: "Beginner", lv_med: "Intermediate", lv_hard: "Adv/Technical"
+    }
+  };
+
+  const dictTur = { "batik": {tr: "Batık", en: "Wreck"}, "resif": {tr: "Resif", en: "Reef"}, "magara": {tr: "Mağara", en: "Cave"}, "arkeoloji": {tr: "Arkeoloji", en: "Archaeology"}, "sanat": {tr: "Sanat", en: "Art"} };
+  const dictSeviye = { "Tüm seviyeler": "All levels", "Başlangıç-İleri": "Beginner-Advanced", "Başlangıç-Orta": "Beginner-Intermediate", "Başlangıç": "Beginner", "Orta-İleri": "Intermediate-Advanced", "Orta": "Intermediate", "İleri": "Advanced", "Teknik": "Technical" };
+
+  const WIKI_SLUGS = {
+    1: {lang:"en",slug:"HMS_Majestic_(1895)"},
+    3: {lang:"en",slug:"HMS_Lundy"},
+    4: {lang:"en",slug:"Assos"},
+    5: {lang:"en",slug:"Gökçeada"},
+    6: {lang:"en",slug:"Ayvalık"},
+    8: {lang:"en",slug:"Deli_Mehmet_Island"},
+    13: {lang:"en",slug:"Foça"},
+    16: {lang:"en",slug:"Bodrum"},
+    19: {lang:"en",slug:"Orak_Island"},
+    22: {lang:"en",slug:"Gulf_of_Gökova"},
+    28: {lang:"en",slug:"Fethiye"},
+    31: {lang:"en",slug:"Amphora"},
+    35: {lang:"en",slug:"Kaş"},
+    36: {lang:"en",slug:"Savoia-Marchetti_SM.79"},
+    43: {lang:"en",slug:"Kekova"},
+    45: {lang:"en",slug:"Kemer,_Antalya"},
+    47: {lang:"en",slug:"Side,_Antalya"},
+    48: {lang:"en",slug:"Side,_Antalya"},
+    49: {lang:"en",slug:"Dana_Island"},
+    51: {lang:"en",slug:"German_submarine_U-20_(1913)"},
+    52: {lang:"en",slug:"Sinop,_Turkey"},
+    55: {lang:"en",slug:"Sivriada"},
+    64: {lang:"en",slug:"Princes'_Islands"},
+    67: {lang:"en",slug:"Büyükada"},
+  };
+
+  const WIKI_QUERIES = {
+    1: "HMS Majestic battleship wreck Gallipoli",
+    2: "Gallipoli underwater wreck diving WWI",
+    3: "Lundy shipwreck Saros diving",
+    4: "Assos ancient harbor ruins underwater",
+    5: "Gökçeada Imbros underwater reef Aegean",
+    6: "Ayvalık red coral underwater Aegean",
+    8: "red coral reef underwater Aegean Turkey",
+    13: "Mediterranean monk seal Foça",
+    14: "Foça monk seal underwater reef",
+    16: "Bodrum scuba diving reef grouper",
+    17: "Karaada cave Bodrum underwater",
+    19: "Orak Island Bodrum wall dive",
+    22: "Gökova Bay diving Mediterranean Turkey",
+    26: "Fethiye cave diving Turkey Mediterranean",
+    27: "cave diving natural light Turkey",
+    28: "seahorse underwater reef Fethiye",
+    31: "ancient amphora underwater Mediterranean",
+    33: "cave diving tunnel Turkey Fethiye",
+    35: "Kaş canyon scuba diving Turkey",
+    36: "SM79 airplane wreck underwater Kas Turkey",
+    37: "C47 Dakota plane wreck underwater diving",
+    43: "Kekova sunken city ruins Turkey",
+    44: "underwater sculpture museum Turkey Kas",
+    45: "Paris II warship wreck Kemer Turkey",
+    47: "Didier wreck WWII underwater Turkey",
+    48: "Side underwater museum Turkey sculpture",
+    49: "Dana Island underwater ruins Turkey",
+    50: "Samandağ reef diving Turkey Mediterranean",
+    51: "German submarine U20 Black Sea wreck",
+    52: "Sinop diving Black Sea underwater",
+    55: "Sivriada Marmara diving Istanbul",
+    64: "Neandros island Marmara underwater coral",
+    67: "Büyükada Princes Islands diving Istanbul",
+  };
+
+  const SEARCH_TERMS = {
+    1: ["HMS Majestic wreck Gallipoli diving Turkey", "HMS Majestic batık Gelibolu dalış"],
+    2: ["Gallipoli Historical Underwater Park scuba diving", "Gelibolu sualtı tarihi park dalış"],
+    3: ["HMS Lundy wreck Gallipoli Turkey diving", "HMS Lundy batık Çanakkale dalış"],
+    4: ["Assos ancient harbor underwater Turkey diving", "Assos antik liman sualtı dalış"],
+    5: ["Gokceada underwater marine park diving Turkey", "Gökçeada sualtı milli park dalış"],
+    6: ["Büyük İlyosta red coral Ayvalik diving Turkey", "Büyük İlyosta kırmızı mercan Ayvalık dalış"],
+    7: ["Kucuk Ilyosta Ayvalik diving Turkey reef", "Küçük İlyosta Ayvalık dalış resif"],
+    8: ["Deli Mehmet Island Ayvalik diving Turkey", "Deli Mehmet Adası Ayvalık dalış"],
+    9: ["Melina Island Ayvalik scuba diving", "Melina Adası Ayvalık dalış"],
+    10: ["Gavur Limani Ayvalik scuba diving Turkey", "Gavur Limanı Ayvalık dalış"],
+    11: ["Incirli Ada Ayvalik diving Turkey reef", "İncirli Ada Ayvalık dalış"],
+    12: ["Cunda Island Ayvalik diving Turkey underwater", "Cunda Adası Ayvalık sualtı dalış"],
+    13: ["Fener Adasi Ayvalik diving Turkey lighthouse", "Fener Adası Ayvalık dalış"],
+    14: ["Foca monk seal diving Turkey underwater", "Foça fok dalış sualtı Türkiye"],
+    15: ["Alacati diving Turkey Aegean reef caves", "Alaçatı dalış Ege resif mağara"],
+    16: ["Big Reef Bodrum diving Turkey scuba", "Büyük Resif Bodrum dalış"],
+    17: ["Karaada cave Bodrum diving Turkey underwater", "Karaada mağara Bodrum dalış"],
+    18: ["SG-115 artificial reef Kusadasi diving Turkey", "SG-115 yapay resif Kuşadası dalış"],
+    19: ["Orak Island Bodrum wall dive Turkey scuba", "Orak Adası Bodrum duvar dalış"],
+    20: ["Kargo Island Bodrum diving Turkey scuba", "Kargı Adası Bodrum dalış"],
+    21: ["Marmaris diving Turkey underwater reef", "Marmaris dalış sualtı resif"],
+    22: ["Gokova Bay diving Turkey Mediterranean wall", "Gökova Körfezi dalış Akdeniz duvar"],
+    23: ["Datca Akvaryum diving Turkey reef", "Datça Akvaryum dalış Türkiye"],
+    24: ["Kusadasi artificial reef diving Turkey Airbus A300", "Kuşadası yapay resif Airbus dalış"],
+    25: ["Didim Apollo Temple diving Turkey underwater", "Didim Apollon sualtı dalış"],
+    26: ["Afkule cave Fethiye diving Turkey", "Afkule mağara Fethiye dalış"],
+    27: ["Turkish Bath dive site Fethiye Turkey scuba", "Türk Hamamı dalış noktası Fethiye"],
+    28: ["Akvaryum Koyu Fethiye diving Turkey seahorse", "Akvaryum Koyu Fethiye sualtı deniz atı"],
+    29: ["Sariyarlar Fethiye diving Turkey reef", "Sarıyarlar Fethiye dalış"],
+    30: ["Barracuda dive site Fethiye Turkey", "Barakuda dalış noktası Fethiye"],
+    31: ["Amphora Bay Fethiye diving Turkey ancient", "Amphora Koyu Fethiye antik dalış"],
+    32: ["Balaban dive site Fethiye Turkey cave", "Balaban dalış noktası Fethiye mağara"],
+    33: ["Turgut's Place Fethiye diving Turkey grouper", "Turgut'un Yeri Fethiye dalış groupa"],
+    34: ["Kalkan wall dive Turkey Mediterranean scuba", "Kalkan duvar dalış Akdeniz"],
+    35: ["Kas canyon dive site Turkey Mediterranean scuba", "Kaş kanyon dalış noktası Akdeniz"],
+    36: ["SM79 Savoia Marchetti wreck Kas Turkey diving", "SM79 İtalyan uçak batığı Kaş dalış"],
+    37: ["C47 Dakota plane wreck Kas Turkey scuba diving", "C47 Dakota uçak batığı Kaş dalış"],
+    38: ["Besmi dive site Kas Turkey Mediterranean", "Besmi dalış noktası Kaş Akdeniz"],
+    39: ["Hidayet Bay Archaeopark Kas Turkey scuba diving", "Hidayet Koyu arkeoloji parkı Kaş dalış"],
+    40: ["Neptune cave Kas Turkey diving", "Neptün mağarası Kaş dalış"],
+    41: ["Oasis dive site Kas Turkey Mediterranean reef", "Oasis dalış noktası Kaş Akdeniz"],
+    42: ["Gurmenli dive site Kas Turkey reef wall", "Gürmenli dalış Kaş duvar"],
+    43: ["Kekova sunken city snorkeling scuba Turkey", "Kekova batık şehir sualtı dalış Türkiye"],
+    44: ["Heykel Park Kas Turkey underwater sculpture diving", "Heykel Parkı Kaş sualtı heykel dalış"],
+    45: ["Paris II wreck Kemer Turkey WWI scuba diving", "Paris II batık Kemer I. Dünya Savaşı dalış"],
+    46: ["Sicani Island Kas Turkey diving Mediterranean", "Sıçan Adası Kaş dalış Akdeniz"],
+    47: ["Didier wreck Antalya Turkey scuba diving", "Saint Didier batık Antalya dalış"],
+    48: ["Side Underwater Museum Turkey scuba diving sculpture", "Side Sualtı Müzesi Türkiye dalış heykel"],
+    49: ["Dana Island Turkey Mediterranean scuba diving", "Dana Adası Mersin Türkiye Akdeniz dalış"],
+    50: ["Samandag reef diving Turkey Hatay Mediterranean", "Samandağ dalış Hatay Akdeniz resif"],
+    51: ["U20 German submarine wreck Karasu Black Sea Turkey", "U20 Alman denizaltı batığı Karasu Karadeniz"],
+    52: ["Sinop diving Black Sea Turkey scuba", "Sinop dalış Karadeniz Türkiye"],
+    53: ["Zonguldak diving Black Sea Turkey scuba reef", "Zonguldak dalış Karadeniz Türkiye"],
+    54: ["Trabzon Gurgen diving Black Sea Turkey", "Trabzon Gürgen dalış Karadeniz"],
+    55: ["Sivriada Marmara Sea Istanbul diving Turkey", "Sivriada Marmara Denizi İstanbul dalış"],
+    56: ["Chios border diving Turkey Aegean reef", "Sakız Adası sınırı Ege dalış Türkiye"],
+    57: ["Gocek Bay diving Turkey Aegean reef scuba", "Göcek Körfezi dalış Ege resif"],
+    58: ["Uluburun shipwreck Kas Turkey Bronze Age diving", "Uluburun batığı Kaş Tunç Çağı dalış"],
+    59: ["Demre Kekova diving Turkey Lycian ruins", "Demre Kekova dalış Likya kalıntıları"],
+    60: ["Hisaronu Bay diving Turkey cave reef", "Hisarönü Körfezi dalış mağara Türkiye"],
+    61: ["Olympos diving Turkey Mediterranean reef", "Olimpos dalış Akdeniz resif Türkiye"],
+    62: ["Eregli diving Black Sea Turkey reef scuba", "Ereğli dalış Karadeniz Türkiye"],
+    63: ["Yassıada Marmara diving Istanbul Turkey reef", "Yassıada Marmara dalış İstanbul"],
+    64: ["Neandros Island Marmara diving Istanbul Turkey", "Neandros Adası Marmara dalış İstanbul"],
+    65: ["Cinarlik artificial reef Yalova Turkey diving", "Çınarcık yapay resif Yalova dalış"],
+    66: ["Sile cliffs Istanbul diving Turkey Black Sea", "Şile Kayalıkları İstanbul dalış Karadeniz"],
+    67: ["Buyukada Princes Islands Istanbul diving Turkey", "Büyükada Prens Adaları İstanbul dalış"],
+    68: ["Heybeliada monastery reef Istanbul diving", "Heybeliada manastır resifi İstanbul dalış"],
+    69: ["Burgazada Kalpazankaya Istanbul diving Turkey", "Burgazada Kalpazankaya İstanbul dalış"],
+    70: ["Kilimli Bay Agva Istanbul diving Turkey", "Kilimli Koyu Ağva İstanbul dalış"],
+  };
+
+  const SITE_PHOTOS = {
+    1: "scuba,wreck,gallipoli,underwater",
+    2: "warship,wreck,underwater,historical",
+    3: "shipwreck,underwater,scuba,aegean",
+    4: "ancient,ruins,underwater,harbor",
+    5: "aegean,reef,underwater,clear,water",
+    6: "red,coral,underwater,reef,aegean",
+    8: "red,coral,deep,underwater,reef",
+    13: "monk,seal,underwater,cave",
+    14: "seal,reef,underwater,marine",
+    16: "reef,scuba,grouper,underwater,aegean",
+    17: "cave,bubbles,underwater,dive",
+    19: "wall,dive,underwater,cliff,deep",
+    22: "wall,scuba,mediterranean,deep,blue",
+    26: "cave,reef,underwater,fethiye",
+    27: "cave,light,underwater,diving,natural",
+    28: "seahorse,underwater,reef,colorful",
+    29: "reef,grouper,underwater,night",
+    31: "amphora,ancient,underwater,roman",
+    33: "cave,tunnel,underwater,diving,shrimp",
+    35: "canyon,scuba,diving,turkey,mediterranean",
+    36: "airplane,wreck,underwater,wwii,bomber",
+    37: "plane,wreck,underwater,diving,dakota",
+    43: "ancient,ruins,underwater,lycian,city",
+    44: "sculpture,art,underwater,diving,museum",
+    45: "warship,wreck,underwater,french,ww1",
+    47: "cargo,wreck,underwater,wwii,gas,mask",
+    48: "museum,sculpture,underwater,ancient",
+    49: "island,ruins,underwater,ancient",
+    50: "tropical,reef,underwater,colorful,fish",
+    51: "submarine,wreck,black,sea,underwater",
+    52: "black,sea,reef,diving,underwater",
+    55: "reef,underwater,istanbul,marmara",
+    64: "coral,reef,biodiversity,underwater",
+    67: "reef,islands,underwater,istanbul",
+  };
+
+  const KORIDOR_CONFIG = {
+    "Marmara":   { color: "#e67e22", label_tr: "Marmara", label_en: "Marmara" },
+    "Çanakkale": { color: "#3498db", label_tr: "Çanakkale", label_en: "Canakkale" },
+    "Ege":       { color: "#2ecc71", label_tr: "Ege", label_en: "Aegean" },
+    "Akdeniz":   { color: "#ff4757", label_tr: "Akdeniz", label_en: "Mediterranean" },
+    "Karadeniz": { color: "#9b59b6", label_tr: "Karadeniz", label_en: "Black Sea" },
+    "Okullar":   { color: "#e74c3c", label_tr: "Okullar & Tesisler", label_en: "Dive Centers" }
+  };
+
+  const SITES = [
+    { id:55, koridor:"Marmara", lat:40.87515, lng:28.97525, name:"Sivriada", name_en:"Sivriada", tur:["resif"], derinlik:"5–25m", seviye:"Orta", desc:"İstanbul'a en yakın dalış noktası. Düşük akıntı, sakin ortam; kentli dalgıçlar için hafta sonu kaçamağı.", desc_en:"The closest dive site to Istanbul. Low current, calm setting; perfect weekend escape for city divers." },
+    { id:63, koridor:"Marmara", lat:40.86715, lng:28.93325, name:"Yassıada", name_en:"Yassiada", tur:["resif","arkeoloji"], derinlik:"10–40m", seviye:"Orta", desc:"Tarihi kalıntılar ve zengin duvar yapısı. Adalarda yürütülen arkeolojik çalışmalar sualtını da etkiliyor.", desc_en:"Historical ruins and rich wall structure. Archaeological work on the islands extends underwater too." },
+    { id:64, koridor:"Marmara", lat:40.84415, lng:28.96625, name:"Neandros Adası", name_en:"Neandros Island", tur:["resif"], derinlik:"10–35m", seviye:"İleri", gem:true, desc:"Marmara Denizi'nin mercan ve biyoçeşitlilik açısından en zengin noktası. İleri seviye gerektiren gizli cevher.", desc_en:"The richest point of the Sea of Marmara for coral and biodiversity. Hidden gem requiring advanced level." },
+    { id:65, koridor:"Marmara", lat:40.64515, lng:29.11225, name:"Çınarcık Yapay Resifi", name_en:"Cinarcik Artificial Reef", tur:["batik","resif"], derinlik:"15–25m", seviye:"Başlangıç-Orta", desc:"Turizmi canlandırmak için batırılan araçların oluşturduğu yapay resif. Başlangıç seviyesi için uygun.", desc_en:"Artificial reef created from vehicles sunk to boost tourism. Suitable for beginner divers." },
+    { id:66, koridor:"Karadeniz", lat:41.17615, lng:29.61325, name:"Şile Kayalıkları", name_en:"Sile Reefs", tur:["resif"], derinlik:"10–25m", seviye:"Orta-İleri", desc:"Karadeniz ekosisteminde akıntılı ama sürprizlerle dolu kıyı resifleri. Şile'nin keşfedilmemiş doğal mirası.", desc_en:"Current-prone coastal reefs in the Black Sea ecosystem, full of surprises. Şile's unexplored natural heritage." },
+    { id:67, koridor:"Marmara", lat:40.83515, lng:29.12825, name:"Büyükada – Kurşunburnu", name_en:"Buyukada Kursunburnu", tur:["resif"], derinlik:"17–40m", seviye:"Tüm seviyeler", desc:"Prens Adaları'nın en iyi dalış noktası. 3 sualtı yarığı; 17m, 22m ve 40m. Denizyıldızı, mercan, anemon parkı. Beşiktaş ve Kadıköy'den vapurla ulaşım.", desc_en:"Best dive site of the Princes Islands. Three underwater gaps at 17m, 22m and 40m. Starfish, coral, anemone park. Ferry access from Besiktas and Kadikoy." },
+    { id:68, koridor:"Marmara", lat:40.86215, lng:29.10025, name:"Heybeliada – Manastır Resifi", name_en:"Heybeliada Monastery Reef", tur:["resif"], derinlik:"10–30m", seviye:"Orta", desc:"Terk-i Dünya Manastırı altındaki korunaklı resif. Marmara'nın kendine özgü fauna ve mercanları; en az bozulmuş noktalardan biri.", desc_en:"Sheltered reef below Terki Dunya Monastery. Marmara's unique fauna and corals; one of the least disturbed sites in the sea." },
+    { id:69, koridor:"Marmara", lat:40.88015, lng:29.06225, name:"Burgazada – Kalpazankaya", name_en:"Burgazada Kalpazankaya", tur:["resif"], derinlik:"10–28m", seviye:"Orta", desc:"Burgazada'nın batı burnundaki kayalık resif. Sargos, lahoz ve müren yoğunluğu. Sait Faik'in yazdığı adanın sualtı hazinesi.", desc_en:"Rocky reef at the western cape of Burgazada. Dense grouper, moray and sargos. Underwater treasure of the island made famous by Sait Faik." },
+    { id:70, koridor:"Karadeniz", lat:41.13215, lng:29.83025, name:"Kilimli Koyu – Ağva", name_en:"Kilimli Bay Agva", tur:["resif"], derinlik:"3–20m", seviye:"Başlangıç-Orta", desc:"Ağva/Şile'nin bakir turkuaz koyunda tüplü dalış ve şnorkel. Karadeniz'in kaya oluşumları arasında renkli deniz yaşamı; İstanbul'a 1 saat mesafe.", desc_en:"Scuba and snorkel in Agva's pristine turquoise cove. Colourful marine life among Black Sea rock formations; 1 hour from Istanbul." },
+    { id:1, koridor:"Çanakkale", lat:40.04347, lng:26.17765, name:"HMS Majestic", name_en:"HMS Majestic", tur:["batik"], derinlik:"24m", seviye:"Tüm seviyeler", desc:"27 Mayıs 1915'te U-21 torpili ile batan İngiliz zırhlısı. Top kuleleri hâlâ sağlam. Dünyanın tek WWI sualtı parkının en dramatik enkazı.", desc_en:"British battleship sunk by U-21 torpedo on 27 May 1915. Gun turrets still intact. The most dramatic wreck in the world's only WWI underwater park." },
+    { id:2, koridor:"Çanakkale", lat:40.05031, lng:26.20015, name:"Gelibolu Tarihi Sualtı Parkı", name_en:"Gallipoli Underwater Park", tur:["batik"], derinlik:"15–40m", seviye:"Tüm seviyeler", desc:"150 km² alanda 23 savaş gemisi enkazı. 2021'de açılan dünyanın tek WWI temalı sualtı parkı. Tarihi önemi tartışmasız.", desc_en:"23 warship wrecks across 150 km². The world's only WWI-themed underwater park, opened in 2021. Historically unrivaled." },
+    { id:3, koridor:"Çanakkale", lat:40.26191, lng:26.28112, name:"Lundy Batığı", name_en:"Lundy Shipwreck", tur:["batik"], derinlik:"28m", seviye:"Orta", desc:"1908 yapımı 188 tonluk tarihi batık. Suvla Koyu'nda yüksek görüş mesafesiyle dikkat çeker.", desc_en:"188-ton historical wreck built in 1908. Located in Suvla Bay with exceptionally high visibility." },
+    { id:4, koridor:"Çanakkale", lat:39.48364, lng:26.33641, name:"Assos Sualtı Antik Limanı", name_en:"Assos Ancient Harbor", tur:["arkeoloji"], derinlik:"5–20m", seviye:"Tüm seviyeler", gem:true, desc:"Antik Assos kentinin sualtındaki liman kalıntıları. Taş bloklar ve çapa izleri. Az bilinen arkeolojik gizem.", desc_en:"Underwater harbor ruins of ancient Assos. Stone blocks and anchor marks. A little-known archaeological mystery." },
+    { id:5, koridor:"Çanakkale", lat:40.23512, lng:25.92543, name:"Gökçeada Deniz Parkı", name_en:"Gokceada Marine Park", tur:["resif"], derinlik:"5–35m", seviye:"Tüm seviyeler", gem:true, desc:"Ege'nin tek deniz koruma alanı. Temiz su, zengin yaban hayatı ve nadiren dalınan koylar.", desc_en:"The Aegean's only marine protected area. Crystal clear water, rich wildlife and rarely dived coves." },
+    { id:6, koridor:"Ege", lat:39.32491, lng:26.60275, name:"Büyük İlyosta", name_en:"Big Ilyosta Reef", tur:["resif"], derinlik:"11–40m", seviye:"Başlangıç-İleri", gem:true, desc:"Kırmızı mercan, böcek, müren, deniz tavşanı. Makro fotoğrafçılık cenneti; her seviyeye uygun.", desc_en:"Red coral, nudibranch, moray and sea hare. A macro photography paradise suitable for all levels." },
+    { id:7, koridor:"Ege", lat:39.32815, lng:26.61522, name:"Küçük İlyosta", name_en:"Small Ilyosta Reef", tur:["resif"], derinlik:"11–40m", seviye:"Başlangıç-Orta", desc:"Her seviyeye uygun resif. Büyük İlyosta'nın hemen yanında; kırmızı mercan ve geniş çaplı deniz yaşamı.", desc_en:"Suitable for all levels. Right next to Big Ilyosta; red coral and diverse marine life." },
+    { id:8, koridor:"Ege", lat:39.34005, lng:26.58201, name:"Deli Mehmet Resifi", name_en:"Deli Mehmet Reef", tur:["resif"], derinlik:"19–70m", seviye:"İleri", gem:true, desc:"İki sualtı tepesi; 27m'den itibaren kırmızı mercan ve gorgon ormanı. İleri seviye için Ege'nin başyapıtı.", desc_en:"Two underwater peaks; red coral and gorgonian forest from 27m. The Aegean's masterpiece for advanced divers." },
+    { id:9, koridor:"Ege", lat:39.35520, lng:26.63510, name:"Melina Adası", name_en:"Melina Island", tur:["resif"], derinlik:"5–30m", seviye:"Tüm seviyeler", desc:"Orfoz yuvaları, sinarit ve sargoz sürüleri. Ayvalık'ın en sakin ve erişilebilir noktalarından biri.", desc_en:"Grouper nests, snapper and bream schools. One of Ayvalık's calmest and most accessible dive spots." },
+    { id:10, koridor:"Ege", lat:39.33015, lng:26.62035, name:"Gavur Limanı", name_en:"Gavur Bay", tur:["resif"], derinlik:"3–35m", seviye:"Tüm seviyeler", desc:"Müren, böcek, deniz tavşanları. Gece dalışı için Ayvalık bölgesinde tercih edilen klasik nokta.", desc_en:"Moray eels, nudibranchs and sea hares. The preferred classic night dive spot around Ayvalık." },
+    { id:11, koridor:"Ege", lat:39.33845, lng:26.60875, name:"İncirli Ada", name_en:"Incirli Island", tur:["arkeoloji","resif"], derinlik:"24–28m", seviye:"Orta", gem:true, desc:"24–28m derinlikte antik yük gemisine ait amfora kalıntıları. Arkeoloji tutkunları için sessiz bir hazine.", desc_en:"Amphora ruins from an ancient cargo ship at 24–28m. A quiet treasure for archaeology enthusiasts." },
+    { id:12, koridor:"Ege", lat:39.38012, lng:26.66015, name:"Cunda Çevresi", name_en:"Cunda Island Reefs", tur:["resif"], derinlik:"12–40m", seviye:"Orta", desc:"Orfoz, mığrı ve müren yoğunluğu yüksek. Cunda Adası çevresinde korunaklı ve sakin resif habitatı.", desc_en:"High density of grouper, wrasse and moray eels. A sheltered and calm reef habitat around Cunda Island." },
+    { id:13, koridor:"Ege", lat:38.32405, lng:26.26250, name:"Fener Adası", name_en:"Fener Island", tur:["magara","resif"], derinlik:"5–30m", seviye:"Orta", gem:true, desc:"Akdeniz foku üreme alanlarına ev sahipliği yapar. Nadir ekoturizm deneyimi; dalış sayısı kısıtlı.", desc_en:"Hosts Mediterranean monk seal breeding areas. A rare ecotourism experience; diving numbers are restricted." },
+    { id:14, koridor:"Ege", lat:38.67515, lng:26.74512, name:"Foça Dalış Noktaları", name_en:"Foca Dive Sites", tur:["resif","magara"], derinlik:"5–35m", seviye:"Tüm seviyeler", gem:true, desc:"Fener çevresindeki resifler ve fok mağaraları. Akdeniz foku habitat alanı; Foça Özel Çevre Koruma Bölgesi.", desc_en:"Reefs and seal caves around the lighthouse. Mediterranean monk seal habitat within the Foça Special Environmental Protection Area." },
+    { id:15, koridor:"Ege", lat:38.25015, lng:26.38025, name:"Alaçatı Mağaraları", name_en:"Alacati Caves", tur:["magara","resif"], derinlik:"8–30m", seviye:"Orta", desc:"Kuzey Ege'nin az keşfedilmiş mağara ve resif noktaları. Rüzgar tutmayan koylar sayesinde dalış sezonu uzundur.", desc_en:"Little-explored cave and reef sites of the northern Aegean. Long diving season thanks to wind-sheltered coves." },
+    { id:16, koridor:"Ege", lat:36.98635, lng:27.43585, name:"Büyük Resif (Bodrum)", name_en:"Big Reef Bodrum", tur:["resif"], derinlik:"7–36m", seviye:"Tüm seviyeler", desc:"Bodrum'un ikonik noktası. Lahoz, orfoz, sinarit ve akya sürüleri. Her seviyeye uygun.", desc_en:"Bodrum's iconic dive site. Dusky grouper, comber, snapper and amberjack schools. Suitable for all levels." },
+    { id:17, koridor:"Ege", lat:36.98015, lng:27.45025, name:"Baloncuk Mağarası", name_en:"Bubble Cave", tur:["magara"], derinlik:"4–15m", seviye:"Tüm seviyeler", desc:"İki mağaradan tavana çarpan hava kabarcıkları yükselir. Karaada'nın en ilginç doğal fenomeni.", desc_en:"Air bubbles rise and hit the ceiling inside two caves. The most fascinating natural phenomenon on Karaada." },
+    { id:18, koridor:"Ege", lat:36.98905, lng:27.43825, name:"SG-115 Batığı", name_en:"SG-115 Coast Guard Wreck", tur:["batik"], derinlik:"18–26m", seviye:"Tüm seviyeler", desc:"Kasıtlı batırılmış sahil güvenlik gemisi. Kaptan köşküne girilebilen yapay resif; üst yapı balıkla dolu.", desc_en:"Purposefully sunk coast guard vessel. Artificial reef where divers can enter the bridge; superstructure packed with fish." },
+    { id:19, koridor:"Ege", lat:36.98305, lng:27.59625, name:"Orak Adası", name_en:"Orak Island", tur:["resif"], derinlik:"5–80m", seviye:"İleri", gem:true, desc:"5m'den ani 80m uçurumu. Az ziyaret edilen teknik nokta; büyük pelagik sürüler.", desc_en:"Sudden 80m wall drop from 5m. Rarely visited technical site; large pelagic fish schools." },
+    { id:20, koridor:"Ege", lat:36.95515, lng:27.31125, name:"Kargı Adası", name_en:"Kargi Island", tur:["resif"], derinlik:"10–40m", seviye:"Orta-İleri", gem:true, desc:"Bodrum'dan 1,5 saat; ıssız ve zengin fauna. Liveaboard için ideal; keşfedilmemiş köşeler mevcut.", desc_en:"1.5 hours from Bodrum; remote and rich fauna. Ideal for liveaboard; unexplored corners await." },
+    { id:21, koridor:"Ege", lat:36.81015, lng:28.26025, name:"Marmaris Açıkları", name_en:"Marmaris Reefs", tur:["resif","batik"], derinlik:"10–40m", seviye:"Tüm seviyeler", desc:"50+ dalış noktası, antik kalıntılar ve zengin resif yaşamı. Kara İncir adaları çevresinde yunus ve Akdeniz foku.", desc_en:"50+ dive sites, ancient ruins and rich reef life. Dolphin and Mediterranean monk seal around the Kara İncir islands." },
+    { id:22, koridor:"Ege", lat:36.99515, lng:28.15025, name:"Gökova Körfezi Duvar", name_en:"Gokova Bay Wall", tur:["resif"], derinlik:"10–50m", seviye:"Orta-İleri", gem:true, desc:"Türkiye'nin en dramatik duvar dalış topografyası. Derinlerde dev orkinos sürüleri; güçlü akıntı.", desc_en:"Turkey's most dramatic wall dive topography. Giant tuna schools in the deep; strong currents." },
+    { id:23, koridor:"Ege", lat:36.69052, lng:27.68007, name:"Datça Akvaryum", name_en:"Datca Aquarium Bay", tur:["resif"], derinlik:"5–30m", seviye:"Tüm seviyeler", desc:"Datça'nın berrak ve sakin sularında renkli resif. Ege koridorunun güney ucunda huzurlu bir nokta.", desc_en:"Colorful reef in the crystal-clear calm waters of Datça. A peaceful spot at the southern tip of the Aegean corridor." },
+    { id:24, koridor:"Ege", lat:37.84515, lng:27.24025, name:"Kuşadası Yapay Resif", name_en:"Kusadasi Artificial Reef", tur:["batik"], derinlik:"15–35m", seviye:"Orta", desc:"Yapay resif olarak batırılan eski sahil güvenlik gemisi. Orta derinlikte erişilebilir ve alg kaplı yapı.", desc_en:"Old coast guard vessel sunk as an artificial reef. Accessible at mid-depth, fully covered in algae and marine growth." },
+    { id:25, koridor:"Ege", lat:37.35015, lng:27.25025, name:"Didim Apollon Çevresi", name_en:"Didim Apollo Ruins", tur:["arkeoloji","resif"], derinlik:"5–25m", seviye:"Orta", gem:true, desc:"Apollon Tapınağı yakınlarındaki antik kalıntılar. Sualtı arkeoloji gözlem turu için ideal.", desc_en:"Ancient ruins near the Temple of Apollo. Ideal for an underwater archaeology observation tour." },
+    { id:56, koridor:"Ege", lat:38.33515, lng:26.31525, name:"Sakız Adası Sınırı", name_en:"Chios Border Reefs", tur:["resif"], derinlik:"10–30m", seviye:"Orta", desc:"Sakız Adası sınırına yakın; az ziyaret edilen sakin ve temiz sular. Sessizlik arayanlar için ideal Ege noktası.", desc_en:"Near the Chios border; rarely visited, calm and extremely clean waters. Ideal Aegean spot for those seeking solitude." },
+    { id:60, koridor:"Ege", lat:36.77515, lng:28.05025, name:"Hisarönü Körfezi", name_en:"Hisaronu Bay", tur:["resif"], derinlik:"10–40m", seviye:"Orta", gem:true, desc:"Marmaris-Datça arasında berrak, akıntısız ve az bilinen körfez. Envanter henüz çıkarılmamış gizli cevher.", desc_en:"Clear, current-free bay between Marmaris and Datça. Hidden gem with inventory not yet fully mapped." },
+    { id:26, koridor:"Akdeniz", lat:36.54576, lng:29.01426, name:"Afkule (Fethiye)", name_en:"Afkule Cave", tur:["resif","magara"], derinlik:"10–30m", seviye:"İleri", desc:"Fethiye'nin en derin ve mağaralarla dolu noktası. Yumuşak mercan ve dramatik mağara duvarları.", desc_en:"Fethiye's deepest point filled with soft coral and dramatic cave walls. For advanced divers only." },
+    { id:27, koridor:"Akdeniz", lat:36.54615, lng:29.01825, name:"Türk Hamamı", name_en:"Turkish Bath Cave", tur:["magara"], derinlik:"7–10m", seviye:"Başlangıç", desc:"Mağara içinde yüzeye açılan doğal havuz. Güneş huzmeleri ve sakin ortamla başlangıç seviyesine uygun.", desc_en:"Natural surface pool inside a cave. Sun rays and calm surroundings make it perfect for beginners." },
+    { id:28, koridor:"Akdeniz", lat:36.63515, lng:29.10525, name:"Akvaryum Koyu", name_en:"Aquarium Bay Fethiye", tur:["resif"], derinlik:"5–18m", seviye:"Tüm seviyeler", desc:"Koruma altındaki şeffaf koy. Deniz atı, ahtapot ve kaplan müreni gözlemi için en iyi Fethiye noktası.", desc_en:"Protected crystal-clear bay. Best Fethiye spot for seahorse, octopus and tiger moray observation." },
+    { id:29, koridor:"Akdeniz", lat:36.63015, lng:29.10025, name:"Sarıyarlar Koyu", name_en:"Sariyarlar Bay", tur:["resif"], derinlik:"10m maks", seviye:"Tüm seviyeler", desc:"Orfozlar, akya sürüleri ve ahtapot bolluğuyla gece dalışı için Fethiye'nin birinci tercihi.", desc_en:"Fethiye's top choice for night diving, with abundant grouper, amberjack schools and octopus." },
+    { id:30, koridor:"Akdeniz", lat:36.62515, lng:29.09525, name:"Barakuda Resifi", name_en:"Barracuda Reef", tur:["resif"], derinlik:"14–42m", seviye:"Orta", desc:"35m'de yüzlerce lagos sürüsü. Güzel duvar dalışı; MÖ 300 öncesi Roma dönemi amforaları yakınında.", desc_en:"Hundreds of sea bass schools at 35m. Beautiful wall dive; near Roman amphora ruins dating before 300 BC." },
+    { id:31, koridor:"Akdeniz", lat:36.62015, lng:29.09025, name:"Amphora Koyu", name_en:"Amphora Bay", tur:["arkeoloji"], derinlik:"14–60m", seviye:"Orta", desc:"MÖ 300 öncesi Roma dönemi amforaları dizilim halinde. 14–60m arasında uzanan arkeolojik zenginlik.", desc_en:"Roman-period amphorae in formation, pre-300 BC. Archaeological richness spread between 14–60m." },
+    { id:32, koridor:"Akdeniz", lat:36.63515, lng:29.03025, name:"Balaban Adası", name_en:"Balaban Island", tur:["resif","magara"], derinlik:"30m", seviye:"Orta", desc:"Dramatik profil; doğal ışık oyunları için fener şart. Duvar ve mağara kombinasyonu.", desc_en:"Dramatic profile; a torch is essential for natural light displays. Wall and cave combination." },
+    { id:33, koridor:"Akdeniz", lat:36.64015, lng:29.02525, name:"Turgut'un Yeri", name_en:"Turgut's Place", tur:["magara"], derinlik:"25–60m", seviye:"İleri", gem:true, desc:"30m tünele giriş; 60m yüzüş, 25m çıkış. Karides koridorları ve üstünde uçak motoru kalıntısı.", desc_en:"Entry into a 30m tunnel; 60m swim, exit at 25m. Shrimp corridors and an aircraft engine ruin above." },
+    { id:34, koridor:"Akdeniz", lat:36.25015, lng:29.41025, name:"Kalkan Duvar", name_en:"Kalkan Wall", tur:["resif"], derinlik:"10–40m", seviye:"Orta", desc:"Açık deniz konumunda büyük balık sürüsü gözlem alanları. Duvar dalışı; Kalkan'ın en popüler tekne güzergahı.", desc_en:"Open sea position with large fish school observation. Wall dive; Kalkan's most popular boat route." },
+    { id:35, koridor:"Akdeniz", lat:36.17945, lng:29.63615, name:"Kanyon + Dimitri", name_en:"Canyon & Dimitri Wreck", tur:["resif","batik"], derinlik:"4–42m", seviye:"Orta", desc:"Kaş'ın meşhur kanyonu ve 1968 tarihli pamuk gemisi Dimitri. 4–42m arası hem yeni başlayan hem ileri seviyeye uygun.", desc_en:"Famous Kaş canyon plus the 1968 cotton cargo ship Dimitri. 4–42m range suits beginners and advanced divers alike." },
+    { id:36, koridor:"Akdeniz", lat:36.14115, lng:29.56385, name:"Uçanbalık Bankosu", name_en:"Flying Fish Reef & SM79", tur:["batik"], derinlik:"58–71m", seviye:"Teknik", desc:"Türkiye'nin en elit teknik dalış noktası. 58–71m arasında WWII İtalyan SM79 bombardıman uçağı.", desc_en:"Turkey's most elite technical dive site. WWII Italian SM79 bomber aircraft at 58–71m depth." },
+    { id:37, koridor:"Akdeniz", lat:36.19325, lng:29.65085, name:"Limanağzı – C47", name_en:"Limanagzi C47 Wreck", tur:["batik"], derinlik:"18–26m", seviye:"Tüm seviyeler", desc:"C47 Dakota uçak batığı ve tarihi Osmanlı ahşap gemi iskeleti. Gece dalışı için Kaş'ta birinci tercih.", desc_en:"C47 Dakota plane wreck and Ottoman wooden ship skeleton. The top night dive choice in Kaş." },
+    { id:38, koridor:"Akdeniz", lat:36.16015, lng:29.56025, name:"Besmi Adası", name_en:"Besmi Island", tur:["resif","arkeoloji"], derinlik:"10–40m+", seviye:"Orta-İleri", desc:"40m+ amfora ve çapa kalıntıları. Besmi'nin ayakkabı şeklindeki silüeti fotoğrafçılar için ikonik.", desc_en:"Amphora and anchor ruins at 40m+. Besmi's shoe-shaped silhouette is iconic for photographers." },
+    { id:39, koridor:"Akdeniz", lat:36.19515, lng:29.62025, name:"Hidayet Koyu", name_en:"Hidayet Bay", tur:["batik","resif"], derinlik:"18–26m", seviye:"Orta", desc:"Sakin Hidayet Koyu'nda gemi batığı; Altuğ gemisi ve tarım uçağı kalıntısı. Müren, kaplumbağa, vatoz.", desc_en:"Ship wreck in calm Hidayet Bay; Altuğ vessel and agricultural aircraft remains. Moray, turtle, stingray." },
+    { id:40, koridor:"Akdeniz", lat:36.18515, lng:29.63025, name:"Neptün (Kaş)", name_en:"Neptune Reef", tur:["resif"], derinlik:"14-40m+", seviye:"İleri", desc:"Güçlü akıntıda avcı balık sürüleri; drift dalışı için Kaş'ın en heyecan verici noktası.", desc_en:"Hunter fish schools in strong current; Kaş's most thrilling spot for drift diving." },
+    { id:41, koridor:"Akdeniz", lat:36.18815, lng:29.63225, name:"Oasis Banko", name_en:"Oasis Reef", tur:["resif"], derinlik:"16m", seviye:"Orta", desc:"Kaplumbağa, barakuda ve aslan balığı gözlemi. 16m tavanıyla başlangıç seviyesine de uygun.", desc_en:"Sea turtle, barracuda and lionfish observation. 16m ceiling makes it accessible for beginners too." },
+    { id:42, koridor:"Akdeniz", lat:36.17015, lng:29.59525, name:"Gürmenli Ada", name_en:"Gurmenli Island", tur:["resif"], derinlik:"10–40m", seviye:"Orta-İleri", desc:"Duvar, ada çevresi ve kayalıklar kombinasyonu. Güçlü akıntısıyla ödüllendirici bir Kaş klasiği.", desc_en:"Wall, island circuit and rocky sections combined. A rewarding Kaş classic known for its strong currents." },
+    { id:43, koridor:"Akdeniz", lat:36.18015, lng:29.86525, name:"Kekova Batıkşehir", name_en:"Kekova Sunken City", tur:["arkeoloji"], derinlik:"1–10m", seviye:"Tüm seviyeler", desc:"MS 2. yüzyıl depreminde batan antik kent. 1–10m derinlikte şnorkel ve kolay dalış alanı.", desc_en:"Ancient city submerged in a 2nd-century AD earthquake. Snorkelling and easy diving at 1–10m depth." },
+    { id:44, koridor:"Akdeniz", lat:36.19515, lng:29.65525, name:"Sualtı Heykel Parkı", name_en:"Underwater Sculpture Park", tur:["sanat"], derinlik:"5–12m", seviye:"Başlangıç", desc:"2006'da kurulan Türkiye'nin ilk sualtı heykel müzesi. Yaklaşık 50 eser, yapay resif işlevi görüyor.", desc_en:"Turkey's first underwater sculpture museum, founded in 2006. Around 50 artworks doubling as artificial reef." },
+    { id:45, koridor:"Akdeniz", lat:36.59865, lng:30.58335, name:"Paris II Batığı", name_en:"Paris II Wreck", tur:["batik"], derinlik:"30–42m", seviye:"İleri", desc:"13.12.1917 tarihli Fransız savaş gemisi; 6 uçaksavar topu sağlam. Küresel en iyi 100 batık listesinde.", desc_en:"French warship dated 13.12.1917; 6 anti-aircraft guns intact. Listed among the world's top 100 wrecks." },
+    { id:46, koridor:"Akdeniz", lat:36.80055, lng:30.59605, name:"Sıçan Adası", name_en:"Sican Island", tur:["resif","batik"], derinlik:"5–40m", seviye:"Orta", desc:"Kemer dalış turlarının gözde noktası. Resif ve çevresindeki batık kalıntıları; her seviyeye uygun.", desc_en:"A favourite on Kemer dive tours. Reef and surrounding wreck ruins; suitable for all levels." },
+    { id:47, koridor:"Akdeniz", lat:36.87785, lng:30.71115, name:"Didier Batığı", name_en:"Didier Wreck", tur:["batik"], derinlik:"30m", seviye:"İleri", desc:"96m WWII yük gemisi; içinde panzer ve gaz maskesi kalıntıları. Efsanevi batık.", desc_en:"96m WWII cargo ship with tank and gas mask remains inside. A legendary wreck." },
+    { id:48, koridor:"Akdeniz", lat:36.75815, lng:31.38525, name:"Side Sualtı Müzesi", name_en:"Side Underwater Museum", tur:["arkeoloji","sanat"], derinlik:"5–15m", seviye:"Tüm seviyeler", desc:"117 eserle Türkiye'nin en kapsamlı sualtı müzesi. Side antik limanı kıyısında kolay ve etkileyici dalış.", desc_en:"Turkey's most comprehensive underwater museum with 117 pieces. Easy and impressive diving beside the ancient port of Side." },
+    { id:49, koridor:"Akdeniz", lat:36.18515, lng:33.77525, name:"Mersin Dana Adası", name_en:"Dana Island", tur:["batik","arkeoloji"], derinlik:"10–30m", seviye:"Orta", gem:true, desc:"Dana Adası batı burnu; antik yağ kavanozu alanı. Az ziyaret edilen Mersin'in gizli arkeolojik hazinesi.", desc_en:"Western cape of Dana Island; ancient oil jar site. Mersin's little-visited hidden archaeological treasure." },
+    { id:50, koridor:"Akdeniz", lat:36.06515, lng:35.95525, name:"Samandağ", name_en:"Samandag Reefs", tur:["resif"], derinlik:"5–40m", seviye:"Tüm seviyeler", gem:true, desc:"Kızıldeniz ekosistemine benzer nadir flora yapısı. Kışın 17–18°C su sıcaklığıyla yıl boyu dalış mümkün.", desc_en:"Rare marine flora resembling the Red Sea ecosystem. Year-round diving possible with 17–18°C winter water temps." },
+    { id:57, koridor:"Akdeniz", lat:36.70015, lng:28.94025, name:"Göcek Körfezi", name_en:"Gocek Bay", tur:["resif","arkeoloji"], derinlik:"5–30m", seviye:"Tüm seviyeler", desc:"Saklı amphora alanları ve zengin orfoz habitatı. Göcek koylarının sualtı keşfedilmemiş köşeleri.", desc_en:"Hidden amphora sites and rich grouper habitat. Unexplored underwater corners of Göcek coves." },
+    { id:58, koridor:"Akdeniz", lat:36.13415, lng:29.69625, name:"Uluburun Yakını", name_en:"Uluburun Vicinity", tur:["arkeoloji"], derinlik:"40–60m", seviye:"Teknik", gem:true, desc:"MÖ 1300 tarihli Uluburun enkazına yakın alan. Teknik + arkeoloji kombinasyonu; izin gerektirir.", desc_en:"Near the 1300 BC Uluburun wreck site. Technical + archaeology combo; permit required." },
+    { id:59, koridor:"Akdeniz", lat:36.21015, lng:29.98025, name:"Demre Çevresi", name_en:"Demre Ancient Coast", tur:["arkeoloji"], derinlik:"2–20m", seviye:"Başlangıç", desc:"Likya medeniyeti suya gömülen liman kalıntıları. Kekova güzergahının tamamlayıcı arkeoloji durağı.", desc_en:"Submerged Lycian civilization harbor ruins. Complementary archaeology stop on the Kekova route." },
+    { id:61, koridor:"Akdeniz", lat:36.35015, lng:30.47025, name:"Olimpos Sualtı", name_en:"Olympos Underwater", tur:["resif","arkeoloji"], derinlik:"5–30m", seviye:"Tüm seviyeler", desc:"Olimpos antik kentinin sulara gömülen kıyıları. Tarihî doku ve deniz yaşamı bir arada.", desc_en:"Sunken coastlines of ancient Olympos. Historical texture and marine life side by side." },
+    { id:51, koridor:"Karadeniz", lat:41.12055, lng:30.68005, name:"U20 Alman Denizaltısı", name_en:"U20 German Submarine", tur:["batik"], derinlik:"42.7m", seviye:"İleri", desc:"WWII'de Karadeniz'e nakledilen Alman U20 denizaltısı. 42.7m derinlikte tam yapısını koruyor.", desc_en:"German U20 submarine transferred to the Black Sea in WWII. Fully intact structure at 42.7m depth." },
+    { id:52, koridor:"Karadeniz", lat:42.03015, lng:35.16025, name:"Sinop Sualtı Noktaları", name_en:"Sinop Dive Sites", tur:["resif","batik"], derinlik:"5–40m", seviye:"Orta", desc:"Volkanik zemin ve Karadeniz'in en iyi görüş mesafesi. Sinop Üniversitesi iş birliğiyle gelişmekte.", desc_en:"Volcanic ground and the Black Sea's best visibility. Developing in partnership with Sinop University." },
+    { id:53, koridor:"Karadeniz", lat:41.46015, lng:31.78025, name:"Zonguldak Denizaltı", name_en:"Zonguldak Naval Wrecks", tur:["batik"], derinlik:"20–50m", seviye:"İleri", gem:true, desc:"BAKKA destekli keşif altyapısı geliştirilmekte. Tarihi deniz savaşı batıkları henüz tam envantere alınmadı.", desc_en:"BAKKA-supported exploration infrastructure developing. Historical naval battle wrecks not yet fully inventoried." },
+    { id:54, koridor:"Karadeniz", lat:41.01015, lng:39.72025, name:"Trabzon – Gürgen", name_en:"Trabzon Gurgen Ferry", tur:["batik"], derinlik:"20–35m", seviye:"Orta", desc:"Karadeniz doğusunda bilinen batıklardan biri. DOKA hedefleriyle örtüşen gelişme potansiyeli yüksek nokta.", desc_en:"One of the known wrecks in eastern Black Sea. High development potential aligned with DOKA targets." },
+    { id:62, koridor:"Karadeniz", lat:41.28515, lng:31.41525, name:"Ereğli Batıkları", name_en:"Eregli Wrecks", tur:["batik","resif"], derinlik:"10–40m", seviye:"Orta", desc:"Endüstriyel liman açıklarında tarihi enkazlar. Sistematik araştırma henüz tamamlanmamış; keşif bekliyor.", desc_en:"Historical wrecks off the industrial port of Ereğli. Systematic survey not yet complete; awaiting exploration." }
+  ];
+
+  const SCHOOLS = [
+    // ── KAŞ (4 merkez) ──
+    { id:101, lat:36.2003, lng:29.6384, koridor:"Akdeniz",
+      name:"Nautilus Dalış Merkezi", name_en:"Nautilus Diving Center",
+      cert:"PADI 5★ Green Star", address:"Liman Cad. No:50, Kaş",
+      phone:"+90 533 962 53 75", web:"nautilusdivingkas.com",
+      tdv:"https://www.tripadvisor.com/Attraction_Review-g297965-d3577380-Reviews-Nautilus_Diving" },
+    { id:102, lat:36.2008, lng:29.6392, koridor:"Akdeniz",
+      name:"SubAQUA Dalış Merkezi", name_en:"SubAQUA Diving Center",
+      cert:"PADI CDC", address:"Kaş Limanı, Kaş",
+      phone:"+90 532 221 01 29", web:"subaquadive.com",
+      tdv:"https://www.tripadvisor.com/Attraction_Review-g297965-d3237687-Reviews-SubAQUA_Diving_Center" },
+    { id:103, lat:36.2001, lng:29.6370, koridor:"Akdeniz",
+      name:"Dragoman Dalış Merkezi", name_en:"Dragoman Diving Centre",
+      cert:"PADI", address:"Andifli Mah. Kaş",
+      phone:"+90 242 836 36 14", web:"dragoman-turkey.com",
+      tdv:"https://www.tripadvisor.com/Attraction_Review-g297965-d2219897-Reviews-Dragoman_Diving_Centre" },
+    { id:104, lat:36.1997, lng:29.6398, koridor:"Akdeniz",
+      name:"Deepist Dalış Merkezi – Kaş", name_en:"Deepist Diving Center – Kas",
+      cert:"PADI 5★", address:"Kaş Yat Limanı, Antalya",
+      phone:"+90 532 276 79 64", web:"deepistdiving.com" },
+    // ── BODRUM (2 merkez) ──
+    { id:105, lat:37.0261, lng:27.4205, koridor:"Ege",
+      name:"Aquapro Dalış Merkezi", name_en:"Aquapro Diving Center",
+      cert:"PADI / CMAS", address:"Bitez Marina, Bodrum",
+      phone:"+90 532 394 91 65", web:"aquapro-turkey.com",
+      tdv:"https://www.tripadvisor.com/Attraction_Review-g297965-d2390994-Reviews-Aquapro_Diving" },
+    { id:106, lat:37.0325, lng:27.4340, koridor:"Ege",
+      name:"Turkuaz Dalış Merkezi", name_en:"Turkuaz Diving Center",
+      cert:"PADI", address:"Bodrum Merkez" },
+    // ── FETHİYE (2 merkez) ──
+    { id:107, lat:36.6225, lng:29.1095, koridor:"Akdeniz",
+      name:"European Dalış Merkezi", name_en:"European Diving Centre",
+      cert:"PADI 5★ IDC", address:"Dispanser Sok. No:27, Fethiye",
+      phone:"+90 542 292 31 27", web:"europeandivingcentre.com" },
+    { id:108, lat:36.6231, lng:29.1118, koridor:"Akdeniz",
+      name:"Fethiye Dalış Merkezi", name_en:"Fethiye Diving Centre",
+      cert:"PADI", address:"Kordonboyu Adalı 2, Fethiye" },
+    // ── MARMARİS (1 merkez) ──
+    { id:109, lat:36.8528, lng:28.2775, koridor:"Ege",
+      name:"Marmaris Dalış Merkezi", name_en:"Marmaris Diving Center",
+      cert:"PADI 5★ IDC", address:"Armutalan Mah. Şehit Ahmet Benler Cad. 39B/3, Marmaris",
+      web:"marmarisdiving.com" },
+    // ── KALKAN (1 merkez) ──
+    { id:110, lat:36.2650, lng:29.4100, koridor:"Akdeniz",
+      name:"Kalkan Dalış Merkezi", name_en:"Kalkan Dive Centre",
+      cert:"PADI", address:"Kalkan Limanı, Antalya" },
+    // ── ANTALYA (2 merkez) ──
+    { id:111, lat:36.8841, lng:30.7035, koridor:"Akdeniz",
+      name:"Pasifik Dalış Merkezi", name_en:"Pasifik Diving Center",
+      cert:"PADI", address:"Kaleiçi Marina, Antalya" },
+    { id:112, lat:36.8900, lng:30.6950, koridor:"Akdeniz",
+      name:"Star Dalış Akademisi", name_en:"Star Diving Academy",
+      cert:"PADI", address:"Antalya Merkez" },
+    // ── İSTANBUL (3 merkez) ──
+    { id:113, lat:40.9631, lng:29.0665, koridor:"Marmara",
+      name:"Caddebostan Balıkadamlar Kulübü", name_en:"Caddebostan Frogmen Club",
+      cert:"CMAS / PADI", address:"Caddebostan Sahil, İstanbul",
+      web:"balikadamlar.org.tr" },
+    { id:114, lat:40.9970, lng:28.7830, koridor:"Marmara",
+      name:"Elysion Dalış Merkezi", name_en:"Elysion Dive Center",
+      cert:"PADI", address:"Cennet Mah. Zafer Sok. No:7/16, Küçükçekmece",
+      web:"elysiondivecenter.com" },
+    { id:115, lat:41.0825, lng:29.0090, koridor:"Marmara",
+      name:"Deepist İstanbul", name_en:"Deepist Istanbul",
+      cert:"PADI", address:"Nispetiye Cad. Yücel Sok. B Blok, 1. Levent",
+      web:"deepistdiving.com" },
+    // ── AYVALIK (1 merkez) ──
+    { id:116, lat:39.3175, lng:26.6951, koridor:"Ege",
+      name:"Ayvalık 3M Dalış", name_en:"Ayvalik 3M Diving",
+      cert:"PADI", address:"Ayvalık Liman, Balıkesir",
+      web:"3mdalis.com" },
+    // ── ÇANAKKALE (1 merkez) ──
+    { id:117, lat:40.1485, lng:26.4021, koridor:"Çanakkale",
+      name:"Troy Dalış Merkezi", name_en:"Troy Dive Center",
+      cert:"PADI", address:"Çanakkale Merkez",
+      web:"troydive.com" }
+  ];
+
+  // KAMERA VE HARİTA SINIRLARI (TÜRKİYE DIŞINA ÇIKMAYI FİZİKSEL OLARAK ENGELLER)
+  const mapBounds = [
+    [35.5, 25.0], // Güney Batı köşesi (Beyrut ve İsrail hariç tutuldu)
+    [42.5, 45.0]  // Kuzey Doğu köşesi
+  ];
+  
+  const defaultMinZoom = window.innerWidth < 768 ? 5 : 5.5;
+
+  const map = L.map('map', { 
+    center: [38.5, 34.0], 
+    zoom: 6, 
+    minZoom: defaultMinZoom,
+    maxZoom: 18,
+    maxBounds: mapBounds,         
+    maxBoundsViscosity: 1.0,      // Sınırdan sekmeyi %100 sert yapar
+    zoomControl: true 
+  });
+  
+  // Sadece Temiz Uydu Katmanı (İçinde yazı/ülke adı BARINDIRMAZ)
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 }).addTo(map);
+
+  // OpenSeaMap — denizcilik & batimetri katmanı (başlangıçta kapalı)
+  const seaMapLayer = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+    maxZoom: 18, opacity: 0.85,
+    attribution: '© <a href="http://www.openseamap.org" target="_blank">OpenSeaMap</a>'
+  });
+  let seaMapActive = false;
+
+  const siteLayer = L.featureGroup().addTo(map);
+  const markerMap = {};
+  const schoolLayer = L.featureGroup();
+  const regionLayer = L.featureGroup().addTo(map); // Temiz coğrafi etiketler için
+
+  // ── ZOOM YÖNETİCİSİ (Yazıları Küçülten Ters Orantı) ──
+  function handleZoom() {
+    const z = map.getZoom();
+    
+    // İkonlar yaklaştıkça hafif büyür
+    let scale = 0.50 + ((z - 6) * 0.12); 
+    if(scale < 0.40) scale = 0.40; 
+    if(scale > 1.3) scale = 1.3; 
+    document.documentElement.style.setProperty('--icon-scale', scale);
+
+    // Yazı boyutu: zoom arttıkça hafifçe küçülür ama her zaman okunabilir
+    let labelSize;
+    if (z <= 7) {
+      labelSize = 0.72;
+    } else if (z <= 9) {
+      labelSize = 0.85;
+    } else if (z <= 11) {
+      labelSize = 0.72;
+    } else {
+      labelSize = 0.62;
+    }
+    document.documentElement.style.setProperty('--site-label-size', labelSize + 'rem');
+    // Hiçbir zaman tamamen gizleme
+    const mapEl2 = document.getElementById('map');
+    mapEl2.classList.remove('hide-site-labels');
+
+    const mapEl = document.getElementById('map');
+    mapEl.classList.remove('show-cities', 'show-districts', 'show-geo', 'show-sites');
+    
+    // Kademeli Gösterim: şehir > ilçe > dalış noktası
+    if (z <= 6) {
+      mapEl.classList.add('show-cities');
+    } else if (z >= 7 && z < 8) {
+      mapEl.classList.add('show-cities', 'show-districts');
+    } else if (z >= 8 && z < 10) {
+      mapEl.classList.add('show-districts', 'show-geo', 'show-sites');
+    } else if (z >= 10) {
+      mapEl.classList.add('show-districts', 'show-geo', 'show-sites');
+    }
+  }
+  map.on('zoomend', handleZoom);
+
+  map.on('click', () => {
+    closeDetailPanel();
+  });
+
+  // ── BÖLGE ETİKETLERİ VERİSİ ──
+  const REGION_LABELS = [
+    // Şehirler (zoom 5-6'da görünür)
+    { tr:"İSTANBUL", en:"ISTANBUL", lat:41.01, lng:28.95, type:"city" },
+    { tr:"İZMİR", en:"IZMIR", lat:38.42, lng:27.14, type:"city" },
+    { tr:"ANTALYA", en:"ANTALYA", lat:36.89, lng:30.70, type:"city" },
+    { tr:"MUĞLA", en:"MUGLA", lat:37.21, lng:28.36, type:"city" },
+    { tr:"ÇANAKKALE", en:"CANAKKALE", lat:40.15, lng:26.40, type:"city" },
+    { tr:"BALIKESİR", en:"BALIKESIR", lat:39.65, lng:27.89, type:"city" },
+    { tr:"SİNOP", en:"SINOP", lat:42.02, lng:35.15, type:"city" },
+    { tr:"TRABZON", en:"TRABZON", lat:41.00, lng:39.72, type:"city" },
+    { tr:"MERSİN", en:"MERSIN", lat:36.80, lng:34.63, type:"city" },
+    { tr:"HATAY", en:"HATAY", lat:36.20, lng:36.16, type:"city" },
+    { tr:"SAKARYA", en:"SAKARYA", lat:40.77, lng:30.39, type:"city" },
+    { tr:"ZONGULDAK", en:"ZONGULDAK", lat:41.45, lng:31.79, type:"city" },
+    // İlçeler (zoom 7'de görünür)
+    { tr:"Bodrum", en:"Bodrum", lat:37.03, lng:27.43, type:"district" },
+    { tr:"Kaş", en:"Kas", lat:36.20, lng:29.64, type:"district" },
+    { tr:"Fethiye", en:"Fethiye", lat:36.62, lng:29.11, type:"district" },
+    { tr:"Marmaris", en:"Marmaris", lat:36.85, lng:28.27, type:"district" },
+    { tr:"Datça", en:"Datca", lat:36.73, lng:27.69, type:"district" },
+    { tr:"Çeşme", en:"Cesme", lat:38.32, lng:26.30, type:"district" },
+    { tr:"Ayvalık", en:"Ayvalik", lat:39.32, lng:26.70, type:"district" },
+    { tr:"Gelibolu", en:"Gallipoli", lat:40.42, lng:26.68, type:"district" },
+    { tr:"Kemer", en:"Kemer", lat:36.60, lng:30.56, type:"district" },
+    { tr:"Side", en:"Side", lat:36.77, lng:31.39, type:"district" },
+    { tr:"Gökova", en:"Gokova", lat:37.00, lng:28.15, type:"district" },
+    { tr:"Göcek", en:"Gocek", lat:36.74, lng:28.96, type:"district" },
+    { tr:"Kalkan", en:"Kalkan", lat:36.26, lng:29.41, type:"district" },
+    { tr:"Kekova", en:"Kekova", lat:36.18, lng:29.89, type:"district" },
+    { tr:"Karasu", en:"Karasu", lat:41.11, lng:30.68, type:"district" },
+    { tr:"Şile", en:"Sile", lat:41.18, lng:29.61, type:"district" },
+    { tr:"Heybeliada", en:"Heybeliada", lat:40.87, lng:29.10, type:"district" },
+    { tr:"Prens Adaları", en:"Princes Islands", lat:40.87, lng:29.00, type:"district" },
+    { tr:"Kınalıada", en:"Kinaliada", lat:40.91, lng:29.05, type:"district" },
+    // Deniz coğrafyası (zoom 8+)
+    { tr:"EGE DENİZİ", en:"AEGEAN SEA", lat:38.5, lng:25.9, type:"geo" },
+    { tr:"AKDENİZ", en:"MEDITERRANEAN", lat:36.3, lng:32.0, type:"geo" },
+    { tr:"KARADENİZ", en:"BLACK SEA", lat:42.0, lng:33.5, type:"geo" },
+    { tr:"MARMARA DENİZİ", en:"SEA OF MARMARA", lat:40.7, lng:28.2, type:"geo" },
+  ];
+
+  // Tertemiz, Doğal Harita Etiketlerini Çizme
+  function drawRegionLabels() {
+    regionLayer.clearLayers();
+    REGION_LABELS.forEach(lbl => {
+      const text = lang === 'en' ? lbl.en : lbl.tr;
+      let className = 'map-label-geo';
+      if (lbl.type === 'city') className = 'map-label-city';
+      if (lbl.type === 'district') className = 'map-label-district';
+      
+      const icon = L.divIcon({
+        html: `<div>${text}</div>`,
+        className: className,
+        iconSize: [200, 40],
+        iconAnchor: [100, 20]
+      });
+      L.marker([lbl.lat, lbl.lng], {icon, interactive: false}).addTo(regionLayer);
+    });
+  }
+
+  function makeIcon(baseColor, gem, isSchool=false, overrideDifficultyColor=null) {
+    if(isSchool) {
+      return L.divIcon({ html: `<svg class="dynamic-svg" width="28" height="28" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" fill="#e74c3c" rx="2"/><path d="M2 5 L22 19" stroke="#fff" stroke-width="3"/></svg>`, className:'', iconSize:[28,28], iconAnchor:[14,14], popupAnchor:[0,-14] });
+    }
+
+    // Zorluk modunda tamamen bağımsız renkler; koridor rengiyle karışmaz
+    const fillColor = overrideDifficultyColor || baseColor;
+    const cy = gem ? 13 : 11;
+    const r = gem ? 11 : 9;
+    const innerSymbol = gem ? `<text x="12" y="${cy+4}" text-anchor="middle" font-size="8" fill="#fff" font-weight="bold">★</text>` : '';
+
+    const svg = `<svg class="dynamic-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+      <circle cx="12" cy="${cy}" r="${r}" fill="${fillColor}" stroke="#fff" stroke-width="2.2"/>
+      ${innerSymbol}
+    </svg>`;
+    return L.divIcon({ html: svg, className:'', iconSize:[24,24], iconAnchor:[12,11], popupAnchor:[0,-11] });
+  }
+
+  function renderBadges() {
+    const badgeRow = document.getElementById('badge-row');
+    badgeRow.innerHTML = `
+      <div class="badge"><div class="badge-dot" style="background:var(--c5)"></div><span>${i18n[lang].c_mar}</span></div>
+      <div class="badge"><div class="badge-dot" style="background:var(--c1)"></div><span>${i18n[lang].c_can}</span></div>
+      <div class="badge"><div class="badge-dot" style="background:var(--c2)"></div><span>${i18n[lang].c_ege}</span></div>
+      <div class="badge"><div class="badge-dot" style="background:var(--c3)"></div><span>${i18n[lang].c_akd}</span></div>
+      <div class="badge"><div class="badge-dot" style="background:var(--c4)"></div><span>${i18n[lang].c_kar}</span></div>
+    `;
+  }
+
+  function drawMap() {
+    siteLayer.clearLayers();
+    schoolLayer.clearLayers();
+    
+    SITES.forEach(s => {
+      if(!matches(s)) return;
+      const baseRegionColor = KORIDOR_CONFIG[s.koridor].color;
+      const icon = makeIcon(baseRegionColor, s.gem, false, null);
+      
+      const turTags = s.tur.map(t => `<span class="popup-tag">${dictTur[t][lang]}</span>`).join('');
+      const koridorLabel = KORIDOR_CONFIG[s.koridor]["label_" + lang];
+      const seviyeLabel = lang === 'en' ? (dictSeviye[s.seviye] || s.seviye) : s.seviye;
+      const descText = lang === 'en' && s.desc_en ? s.desc_en : s.desc;
+      const siteName = lang === 'en' && s.name_en ? s.name_en : s.name;
+
+      const m = L.marker([s.lat,s.lng], {icon});
+      m.bindTooltip(siteName, { permanent: true, direction: 'bottom', className: 'map-label-site', offset: [0, 10] });
+
+      m.on('click', async () => {
+        const panel = document.getElementById('detail-panel');
+        const body  = document.getElementById('detail-panel-body');
+
+        // İçeriği doldur
+        body.innerHTML = `
+          <div class="popup-body">
+            <div class="popup-koridor" style="color:${baseRegionColor}">${koridorLabel}</div>
+            <div class="popup-name">${siteName} ${s.gem ? '💎' : ''}</div>
+            <div class="popup-tags">${turTags}</div>
+            <div class="dist-badge" id="dist-${s.id}"></div>
+            <div class="popup-desc">${descText}</div>
+            <div style="font-size:.75rem;color:#94a3b8;margin-bottom:8px;">${i18n[lang].depth}: <b style="color:#fff">${s.derinlik}</b> &nbsp;|&nbsp; ${i18n[lang].level}: <b style="color:#fff">${seviyeLabel}</b></div>
+            <div id="marine-${s.id}" class="marine-data">${i18n[lang].wait}</div>
+            <div id="sb-${s.id}" class="search-bar-slot"></div>
+          </div>`;
+
+        panel.classList.add('open');
+        // Seçili sidebar item'ı vurgula
+        document.querySelectorAll('.site-item').forEach(el => el.classList.remove('highlighted'));
+        const el = document.querySelector(`.site-item[data-id="${s.id}"]`);
+        if (el) el.classList.add('highlighted');
+
+        // Galeri / linkler
+        loadGallery(s.id, s.lat, s.lng, s.name);
+
+        // Uzaklık
+        if (userLatLng) {
+          const dist = (userLatLng.distanceTo([s.lat, s.lng]) / 1000).toFixed(1);
+          const dBox = document.getElementById(`dist-${s.id}`);
+          if (dBox) { dBox.style.display = 'inline-block'; dBox.innerText = `📍 ${i18n[lang].dist}: ${dist} km`; }
+        }
+
+        // Hava + deniz verisi
+        try {
+          const [wRes, mRes] = await Promise.all([
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${s.lat}&longitude=${s.lng}&current_weather=true`),
+            fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${s.lat}&longitude=${s.lng}&current=sea_surface_temperature,wave_height,wave_period&timezone=auto`)
+          ]);
+          const b = document.getElementById(`marine-${s.id}`);
+          if (!b) return;
+          let html = '';
+          if (wRes.ok) {
+            const w = (await wRes.json()).current_weather;
+            html += `<div class="md-row"><span>🌡️ Hava:</span><span>${w.temperature}°C</span></div>`;
+            html += `<div class="md-row"><span>💨 Rüzgar:</span><span>${w.windspeed} km/s</span></div>`;
+          }
+          if (mRes.ok) {
+            const md = (await mRes.json()).current;
+            if (md) {
+              if (md.sea_surface_temperature != null) html += `<div class="md-row"><span>🌊 Deniz:</span><span>${md.sea_surface_temperature.toFixed(1)}°C</span></div>`;
+              if (md.wave_height != null) html += `<div class="md-row"><span>🌀 Dalga:</span><span>${md.wave_height.toFixed(1)} m</span></div>`;
+              if (md.wave_period != null) html += `<div class="md-row"><span>⏱️ Periyot:</span><span>${md.wave_period.toFixed(0)} sn</span></div>`;
+            }
+          }
+          b.innerHTML = html || '<span style="opacity:.5">Veri yok</span>';
+        } catch(e) {
+          const b = document.getElementById(`marine-${s.id}`);
+          if (b) b.innerHTML = '<span style="opacity:.5">Bağlantı hatası</span>';
+        }
+      });
+      m.addTo(siteLayer);
+      markerMap[s.id] = m;
+    });
+
+    SCHOOLS.forEach(sc => {
+      const icon = makeIcon("", false, true);
+      const sName = lang === 'en' ? (sc.name_en || sc.name) : sc.name;
+      const sAddr = sc.address || '';
+      const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(sName + ' ' + sAddr)}/@${sc.lat},${sc.lng},15z`;
+      const pop = `
+        <div class="popup-inner">
+          <div class="popup-koridor" style="color:#e74c3c">OKUL & TESİS</div>
+          <div class="popup-title">${sName}</div>
+          ${sc.cert ? `<span class="cert-badge">${sc.cert}</span>` : ''}
+          <div style="font-size:.78rem;color:#3a6a8a;margin:5px 0 8px;">${sAddr}</div>
+          ${sc.phone ? `<div style="font-size:.78rem;margin-bottom:4px;">📞 <a href="tel:${sc.phone.replace(/ /g,'')}" style="color:var(--teal);text-decoration:none;">${sc.phone}</a></div>` : ''}
+          ${sc.web ? `<div style="font-size:.78rem;margin-bottom:6px;">🌐 <a href="https://${sc.web}" target="_blank" style="color:var(--teal);text-decoration:none;">${sc.web}</a></div>` : ''}
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+            <a class="photo-search-btn" style="font-size:.72rem;padding:6px 9px;" href="${mapsUrl}" target="_blank">📍 Google Maps</a>
+            ${sc.tdv ? `<a class="photo-search-btn" style="font-size:.72rem;padding:6px 9px;" href="${sc.tdv}" target="_blank">⭐ Tripadvisor</a>` : ''}
+          </div>
+          <div class="dist-badge" id="dist-${sc.id}" style="margin-top:6px;"></div>
+        </div>`;
+      L.marker([sc.lat, sc.lng], {icon}).bindPopup(pop).addTo(schoolLayer);
+    });
+  }
+
+  let activeFilter = 'all';
+  let searchVal = '';
+  let activeDepth = null;
+  let activeLevel = null;
+
+  function showSearchButtons(wrap, siteName, lat, lng, siteId) {
+    const terms = SEARCH_TERMS[siteId] || [siteName + ' scuba diving Turkey underwater', siteName + ' dalış sualtı Türkiye'];
+    const gImgUrlEn = `https://www.google.com/search?q=${encodeURIComponent(terms[0])}&tbm=isch`;
+    const gImgUrl   = `https://www.google.com/search?q=${encodeURIComponent(terms[1])}&tbm=isch`;
+    const ytUrl     = `https://www.youtube.com/results?search_query=${encodeURIComponent(terms[0])}`;
+    const mapsUrl   = `https://www.google.com/maps/search/${encodeURIComponent(terms[0])}/@${lat},${lng},13z`;
+    const diveCtrUrl= `https://www.google.com/maps/search/${encodeURIComponent('dalış merkezi dive center')}/@${lat},${lng},12z`;
+    wrap.innerHTML = `
+      <div class="photo-search-bar">
+        <a class="photo-search-btn" href="${gImgUrl}" target="_blank"><span class="btn-icon">🖼</span> Görseller</a>
+        <a class="photo-search-btn" href="${gImgUrlEn}" target="_blank"><span class="btn-icon">🖼</span> Photos</a>
+        <a class="photo-search-btn" href="${ytUrl}" target="_blank"><span class="btn-icon">▶</span> YouTube</a>
+        <a class="photo-search-btn" href="${mapsUrl}" target="_blank"><span class="btn-icon">📍</span> Google Maps</a>
+        <a class="photo-search-btn" style="grid-column:1/-1;font-size:.75rem;padding:9px;" href="${diveCtrUrl}" target="_blank"><span class="btn-icon">⚓</span> Yakın Dalış Merkezleri / Dive Centers</a>
+        <span class="photo-search-label">Fotoğraf henüz eklenmedi</span>
+      </div>`;
+  }
+
+  function loadGallery(siteId, siteLat, siteLng, siteName) {
+    const wrap = document.getElementById('sb-' + siteId);
+    if (!wrap || wrap.dataset.loaded) return;
+    wrap.dataset.loaded = '1';
+    showSearchButtons(wrap, siteName, siteLat, siteLng, siteId);
+  }
+
+  window.closeDetailPanel = function() {
+    document.getElementById('detail-panel').classList.remove('open');
+    document.querySelectorAll('.site-item').forEach(el => el.classList.remove('highlighted'));
+  };
+
+  function selectSite(id, lat, lng) {
+    map.setView([lat, lng], 14);
+    setTimeout(() => {
+      const marker = markerMap[id];
+      if (marker) marker.fire('click');
+    }, 350);
+    document.querySelectorAll('.site-item').forEach(el => el.classList.remove('highlighted'));
+    const el = document.querySelector(`.site-item[data-id="${id}"]`);
+    if (el) el.classList.add('highlighted');
+  }
+
+  function parseMaxDepth(derinlik) {
+    // "5–35m", "28m", "10–80m" gibi formatlardan max değeri çıkar
+    const nums = derinlik.replace(/[^\d–\-]/g,'').split(/[–\-]/).map(Number).filter(n=>!isNaN(n)&&n>0);
+    return nums.length ? Math.max(...nums) : 0;
+  }
+
+  function matchesDepth(s) {
+    if (!activeDepth) return true;
+    const d = parseMaxDepth(s.derinlik);
+    if (activeDepth === 'shallow') return d <= 18;
+    if (activeDepth === 'mid')     return d > 18 && d <= 30;
+    if (activeDepth === 'deep')    return d > 30;
+    return true;
+  }
+
+  function matchesLevel(s) {
+    if (!activeLevel) return true;
+    const sv = s.seviye.toLowerCase();
+    if (activeLevel === 'beginner')     return sv.includes('başlangıç') || sv.includes('tüm');
+    if (activeLevel === 'intermediate') return sv.includes('orta') || sv.includes('tüm');
+    if (activeLevel === 'advanced')     return sv.includes('ileri') || sv.includes('teknik') || sv.includes('tüm');
+    return true;
+  }
+
+  function matches(s) {
+    const matchF = (activeFilter === 'all') || (activeFilter === 'gem' ? s.gem : (Array.isArray(s.tur) && s.tur.includes(activeFilter)));
+    const sName = lang === 'en' && s.name_en ? s.name_en : s.name;
+    const matchS = !searchVal || sName.toLowerCase().includes(searchVal) || s.koridor.toLowerCase().includes(searchVal);
+    return matchF && matchS && matchesDepth(s) && matchesLevel(s);
+  }
+
+  function renderSidebar() {
+    const isSchoolView = false;
+    const filtered = isSchoolView ? SCHOOLS : SITES.filter(matches);
+    const groups = {};
+    filtered.forEach(s => { if(!groups[s.koridor]) groups[s.koridor]=[]; groups[s.koridor].push(s); });
+    
+    let html = '';
+    const ORDER = ["Marmara", "Çanakkale", "Ege", "Akdeniz", "Karadeniz", "Okullar"];
+    
+    ORDER.forEach(k => {
+      if(!groups[k]) return;
+      const cfg = KORIDOR_CONFIG[k];
+      const isExp = searchVal.length > 0 || isSchoolView ? "expanded" : "";
+      
+      html += `<div class="sidebar-section ${isExp}">
+        <div class="sidebar-section-header">
+          <div class="ssh-dot" style="background:${cfg.color}"></div>
+          <div class="ssh-title">${cfg["label_"+lang]} (${groups[k].length})</div>
+          <div class="ssh-toggle">▼</div>
+        </div>
+        <div class="sidebar-section-content">`;
+        
+      groups[k].forEach(s => {
+        let meta = "";
+        const sName = lang === 'en' && s.name_en ? s.name_en : s.name;
+        if(isSchoolView) { meta = `📞 ${s.phone}`; } 
+        else {
+          const seviyeLabel = lang === 'en' ? (dictSeviye[s.seviye] || s.seviye) : i18n[lang].level + ": " + s.seviye;
+          meta = `⬇ ${s.derinlik} - ⚓ ${seviyeLabel}`;
+        }
+        html += `<div class="site-item" data-id="${s.id}" onclick="selectSite('${s.id}', ${s.lat}, ${s.lng})">
+          <div class="site-item-name">${sName} ${s.gem?'💎':''}</div>
+          <div class="site-item-meta">${meta}</div>
+        </div>`;
+      });
+      html += `</div></div>`;
+    });
+    document.getElementById('sidebar-content').innerHTML = html;
+  }
+
+  document.getElementById('filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if(!btn) return;
+    if(btn.classList.contains('active') && btn.dataset.filter !== 'all') {
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      document.getElementById('f-all').classList.add('active');
+      activeFilter = 'all';
+    } else {
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+    }
+    map.removeLayer(schoolLayer);
+    map.addLayer(siteLayer);
+    drawMap();
+    renderSidebar();
+  });
+
+  // ── TOAST ──
+  let toastTimer;
+  function showToast(msg, duration=3500) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  document.getElementById('seaMapToggle').addEventListener('click', function() {
+    seaMapActive = !seaMapActive;
+    this.classList.toggle('active', seaMapActive);
+    if (seaMapActive) {
+      seaMapLayer.addTo(map);
+      if (map.getZoom() < 10) {
+        showToast('🌊 Denizcilik haritası zoom 10+ seviyesinde görünür — yaklaştırın');
+      } else {
+        showToast('🌊 Denizcilik haritası katmanı açıldı');
+      }
+    } else {
+      map.removeLayer(seaMapLayer);
+      showToast('Denizcilik haritası kapatıldı');
+    }
+  });
+
+  // ── DROPDOWN HELPER ──
+  function setupDropdown(wrapId, onSelect) {
+    const wrap = document.getElementById(wrapId);
+    const trigger = wrap.querySelector('.dd-trigger');
+    trigger.addEventListener('click', e => {
+      e.stopPropagation();
+      // Diğer açık dropdown'ları kapat
+      document.querySelectorAll('.dd-wrap.open').forEach(w => { if(w !== wrap) w.classList.remove('open'); });
+      wrap.classList.toggle('open');
+    });
+    wrap.querySelector('.dd-menu').addEventListener('click', e => {
+      const item = e.target.closest('.dd-item');
+      if (!item) return;
+      onSelect(item);
+      wrap.classList.remove('open');
+    });
+  }
+
+  // Tüm dropdown'ları dışarı tıklayınca kapat
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.dd-wrap.open').forEach(w => w.classList.remove('open'));
+  });
+
+  // ── DİL DROPDOWN ──
+  setupDropdown('langDDWrap', item => {
+    const newLang = item.dataset.lang;
+    if (!newLang) return;
+    lang = newLang;
+    document.querySelectorAll('#langMenu .dd-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    const flagMap = {
+      tr: `<svg width="20" height="14" viewBox="0 0 30 20" style="border-radius:2px;vertical-align:middle"><rect width="30" height="20" fill="#E30A17"/><circle cx="10.5" cy="10" r="6" fill="#fff"/><circle cx="12" cy="10" r="4.8" fill="#E30A17"/><polygon points="16.5,10 18.5,8.8 18.5,11.2" fill="#fff"/><polygon points="17.5,7.5 20.5,10 17.5,12.5 18.5,10" fill="#fff"/></svg>`,
+      en: `<svg width="20" height="14" viewBox="0 0 60 40" style="border-radius:2px;vertical-align:middle"><rect width="60" height="40" fill="#012169"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="3.5"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="6"/></svg>`
+    };
+    const labelMap = { tr: 'TR', en: 'EN' };
+    document.getElementById('langFlag').innerHTML = flagMap[lang];
+    document.getElementById('langLabel').textContent = labelMap[lang];
+    document.getElementById('ui-title').innerHTML = i18n[lang].title;
+    document.getElementById('ui-subtitle').innerText = i18n[lang].sub;
+    document.getElementById('f-all').innerText = i18n[lang].all;
+    document.getElementById('f-wreck').innerText = i18n[lang].wreck;
+    document.getElementById('f-reef').innerText = i18n[lang].reef;
+    document.getElementById('f-cave').innerText = i18n[lang].cave;
+    document.getElementById('search').placeholder = i18n[lang].search;
+    renderBadges(); drawMap(); renderSidebar(); map.closePopup();
+  });
+
+  // ── DERİNLİK DROPDOWN ──
+  const depthLabels = { shallow:'🏊 Sığ ≤18m', mid:'🤿 Orta 18–30m', deep:'⚙️ Derin 30m+', all:null };
+  setupDropdown('depthDDWrap', item => {
+    const val = item.dataset.depth;
+    if (val === 'all') {
+      activeDepth = null;
+      document.querySelectorAll('#depthMenu .dd-item').forEach(i => i.classList.remove('active'));
+      document.getElementById('depthTrigger').innerHTML = '⬇ Derinlik <span class="dd-arrow">▼</span>';
+      document.getElementById('depthTrigger').classList.remove('has-filter');
+    } else {
+      activeDepth = val;
+      document.querySelectorAll('#depthMenu .dd-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById('depthTrigger').innerHTML = depthLabels[val] + ' <span class="dd-arrow">▼</span>';
+      document.getElementById('depthTrigger').classList.add('has-filter');
+    }
+    drawMap(); renderSidebar();
+  });
+
+  // ── SEVİYE DROPDOWN ──
+  const levelLabels = { beginner:'🟢 Başlangıç', intermediate:'🟡 Orta', advanced:'🔴 İleri/Teknik', all:null };
+  setupDropdown('levelDDWrap', item => {
+    const val = item.dataset.level;
+    if (val === 'all') {
+      activeLevel = null;
+      document.querySelectorAll('#levelMenu .dd-item').forEach(i => i.classList.remove('active'));
+      document.getElementById('levelTrigger').innerHTML = '⚑ Seviye <span class="dd-arrow">▼</span>';
+      document.getElementById('levelTrigger').classList.remove('has-filter');
+    } else {
+      activeLevel = val;
+      document.querySelectorAll('#levelMenu .dd-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById('levelTrigger').innerHTML = levelLabels[val] + ' <span class="dd-arrow">▼</span>';
+      document.getElementById('levelTrigger').classList.add('has-filter');
+    }
+    drawMap(); renderSidebar();
+  });
+
+  document.getElementById('sidebar-content').addEventListener('click', e => {
+    const h = e.target.closest('.sidebar-section-header');
+    if (h) h.parentElement.classList.toggle('expanded');
+  });
+
+  document.getElementById('search').addEventListener('input', e => { searchVal = e.target.value.toLowerCase(); renderSidebar(); drawMap(); });
+
+  document.getElementById('locateBtn').addEventListener('click', () => map.locate({setView: true, maxZoom: 10}));
+
+  // İlk Başlatma Rutini
+  handleZoom();
+  drawRegionLabels();
+  renderBadges();
+  drawMap();
+  renderSidebar();
+
+} catch (e) {
+  console.error("Script Hatası:", e);
+}
+</script>
+</body>
+</html>
